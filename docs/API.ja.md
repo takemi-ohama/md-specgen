@@ -1,36 +1,34 @@
-# md-specgen API Reference
+# md-specgen API リファレンス
 
-This document provides detailed explanation of the public API of the `md-specgen` package.
+このドキュメントでは、`md-specgen`パッケージの公開APIについて詳細に説明します。
 
-[日本語版 API (Japanese)](./API.ja.md)
+## 目次
 
-## Table of Contents
-
-- [Core Functions](#core-functions)
-- [Configuration Management](#configuration-management)
-- [Markdown Processing](#markdown-processing)
-- [HTML Generation](#html-generation)
-- [PDF Generation](#pdf-generation)
-- [Mermaid Processing](#mermaid-processing)
-- [Image Processing](#image-processing)
-- [LLM Features](#llm-features)
-- [Type Definitions](#type-definitions)
+- [コア機能](#コア機能)
+- [設定管理](#設定管理)
+- [Markdown処理](#markdown処理)
+- [HTML生成](#html生成)
+- [PDF生成](#pdf生成)
+- [Mermaid処理](#mermaid処理)
+- [画像処理](#画像処理)
+- [LLM機能](#llm機能)
+- [型定義](#型定義)
 
 ---
 
-## Core Functions
+## コア機能
 
 ### `generate(options: Config): Promise<GenerateResult>`
 
-Main generation function. Converts Markdown files to HTML/PDF based on configuration.
+メインの生成関数です。設定に基づいてMarkdownファイルをHTML/PDFに変換します。
 
-**Arguments:**
-- `options` (`Config`): Configuration object
+**引数:**
+- `options` (`Config`): 設定オブジェクト
 
-**Returns:**
-- `Promise<GenerateResult>`: Generation result
+**戻り値:**
+- `Promise<GenerateResult>`: 生成結果
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { generate, loadConfig } from 'md-specgen';
@@ -38,24 +36,24 @@ import { generate, loadConfig } from 'md-specgen';
 const config = await loadConfig('./md-specgen.config.json');
 const result = await generate(config);
 
-console.log(`Files generated: ${result.filesGenerated}`);
+console.log(`生成されたファイル数: ${result.filesGenerated}`);
 ```
 
 ---
 
-## Configuration Management
+## 設定管理
 
 ### `loadConfig(configPath: string): Promise<Config>`
 
-Loads configuration file (JSON/YAML) and merges with default configuration.
+設定ファイル（JSON/YAML）を読み込み、デフォルト設定とマージします。
 
-**Arguments:**
-- `configPath` (`string`): Configuration file path
+**引数:**
+- `configPath` (`string`): 設定ファイルパス
 
-**Returns:**
-- `Promise<Config>`: Merged configuration object
+**戻り値:**
+- `Promise<Config>`: マージされた設定オブジェクト
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { loadConfig } from 'md-specgen';
@@ -65,12 +63,12 @@ const config = await loadConfig('./md-specgen.config.json');
 
 ### `getDefaultConfig(): Config`
 
-Gets default configuration.
+デフォルト設定を取得します。
 
-**Returns:**
-- `Config`: Default configuration object
+**戻り値:**
+- `Config`: デフォルト設定オブジェクト
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { getDefaultConfig } from 'md-specgen';
@@ -81,16 +79,16 @@ console.log(defaultConfig.inputDir); // './markdown'
 
 ### `mergeConfig(base: Config, override: Partial<Config>): Config`
 
-Merges two configuration objects.
+2つの設定オブジェクトをマージします。
 
-**Arguments:**
-- `base` (`Config`): Base configuration
-- `override` (`Partial<Config>`): Override configuration
+**引数:**
+- `base` (`Config`): ベース設定
+- `override` (`Partial<Config>`): 上書き設定
 
-**Returns:**
-- `Config`: Merged configuration
+**戻り値:**
+- `Config`: マージされた設定
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { getDefaultConfig, mergeConfig } from 'md-specgen';
@@ -102,30 +100,30 @@ const merged = mergeConfig(base, custom);
 
 ### `configFromCliArgs(args: any): Partial<Config>`
 
-Builds configuration object from CLI arguments.
+CLI引数から設定オブジェクトを構築します。
 
-**Arguments:**
-- `args` (`any`): CLI arguments object
+**引数:**
+- `args` (`any`): CLI引数オブジェクト
 
-**Returns:**
-- `Partial<Config>`: Configuration object
+**戻り値:**
+- `Partial<Config>`: 設定オブジェクト
 
 ---
 
-## Markdown Processing
+## Markdown処理
 
 ### `parseMarkdown(markdown: string, options?: MarkdownParserOptions): Promise<string>`
 
-Converts Markdown string to HTML.
+Markdown文字列をHTMLに変換します。
 
-**Arguments:**
-- `markdown` (`string`): Markdown text
-- `options` (`MarkdownParserOptions`, optional): Parser options
+**引数:**
+- `markdown` (`string`): Markdownテキスト
+- `options` (`MarkdownParserOptions`, オプション): パーサーオプション
 
-**Returns:**
-- `Promise<string>`: Converted HTML
+**戻り値:**
+- `Promise<string>`: 変換されたHTML
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { parseMarkdown } from 'md-specgen';
@@ -137,31 +135,31 @@ console.log(html); // '<h1>Hello</h1>\n<p>This is <strong>bold</strong> text.</p
 
 ### `MarkdownParser`
 
-Markdown parser class.
+Markdownパーサークラスです。
 
-**Constructor:**
+**コンストラクタ:**
 
 ```typescript
 new MarkdownParser(options?: MarkdownParserOptions)
 ```
 
-**Methods:**
+**メソッド:**
 
 #### `parseMarkdown(markdown: string): Promise<string>`
 
-Converts Markdown string to HTML.
+Markdown文字列をHTMLに変換します。
 
 ### `parseFrontmatter(markdown: string): ParsedFrontmatter`
 
-Parses frontmatter from Markdown.
+MarkdownからFrontmatterを解析します。
 
-**Arguments:**
-- `markdown` (`string`): Markdown text
+**引数:**
+- `markdown` (`string`): Markdownテキスト
 
-**Returns:**
+**戻り値:**
 - `ParsedFrontmatter`: `{ data, content }`
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { parseFrontmatter } from 'md-specgen';
@@ -180,28 +178,28 @@ console.log(content); // 'Content here.'
 
 ### `hasFrontmatter(markdown: string): boolean`
 
-Checks if Markdown contains frontmatter.
+MarkdownにFrontmatterが含まれているか確認します。
 
 ### `stripFrontmatter(markdown: string): string`
 
-Removes frontmatter from Markdown.
+MarkdownからFrontmatterを除去します。
 
 ---
 
-## HTML Generation
+## HTML生成
 
 ### `convertToHtml(markdown: string, options?: HtmlConversionOptions): Promise<HtmlConversionResult>`
 
-Converts Markdown to HTML and applies template.
+MarkdownをHTMLに変換し、テンプレートを適用します。
 
-**Arguments:**
-- `markdown` (`string`): Markdown text
-- `options` (`HtmlConversionOptions`, optional): Conversion options
+**引数:**
+- `markdown` (`string`): Markdownテキスト
+- `options` (`HtmlConversionOptions`, オプション): 変換オプション
 
-**Returns:**
+**戻り値:**
 - `Promise<HtmlConversionResult>`: `{ html, title, frontmatter }`
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { convertToHtml } from 'md-specgen';
@@ -216,28 +214,28 @@ const result = await convertToHtml(markdown, {
 });
 
 console.log(result.title); // 'My Document'
-console.log(result.html); // Complete HTML document
+console.log(result.html); // 完全なHTMLドキュメント
 ```
 
 ### `generateBreadcrumbs(relativePath: string, rootTitle?: string): Array<{ title: string; href?: string }>`
 
-Generates breadcrumb list from file path.
+ファイルパスからパンくずリストを生成します。
 
-**Arguments:**
-- `relativePath` (`string`): File relative path (e.g., "section1/subsection/file.md")
-- `rootTitle` (`string`, optional): Root title (default: "Home")
+**引数:**
+- `relativePath` (`string`): ファイル相対パス（例: "section1/subsection/file.md"）
+- `rootTitle` (`string`, オプション): ルートタイトル（デフォルト: "ホーム"）
 
-**Returns:**
-- `Array<{ title: string; href?: string }>`: Breadcrumb list
+**戻り値:**
+- `Array<{ title: string; href?: string }>`: パンくずリスト
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { generateBreadcrumbs } from 'md-specgen';
 
-const breadcrumbs = generateBreadcrumbs('section1/subsection/file.md', 'Requirements Spec');
+const breadcrumbs = generateBreadcrumbs('section1/subsection/file.md', '要件定義書');
 // [
-//   { title: 'Requirements Spec', href: 'index.html' },
+//   { title: '要件定義書', href: 'index.html' },
 //   { title: 'section1', href: 'section1/index.html' },
 //   { title: 'subsection', href: 'section1/subsection/index.html' },
 //   { title: 'file', href: undefined }
@@ -246,43 +244,43 @@ const breadcrumbs = generateBreadcrumbs('section1/subsection/file.md', 'Requirem
 
 ### `loadTemplate(templatePath: string): Promise<string>`
 
-Loads HTML template file.
+HTMLテンプレートファイルを読み込みます。
 
 ### `applyTemplate(data: TemplateData, customTemplate?: string): string`
 
-Applies data to template.
+テンプレートにデータを適用します。
 
-**Arguments:**
-- `data` (`TemplateData`): Template data
-- `customTemplate` (`string`, optional): Custom template
+**引数:**
+- `data` (`TemplateData`): テンプレートデータ
+- `customTemplate` (`string`, オプション): カスタムテンプレート
 
-**Returns:**
-- `string`: Completed HTML
+**戻り値:**
+- `string`: 完成したHTML
 
 ### `getDefaultTemplate(): string`
 
-Gets default HTML template.
+デフォルトのHTMLテンプレートを取得します。
 
 ### `generateIndexPage(entries: IndexEntry[], options?: IndexPageOptions): string`
 
-Generates index page (table of contents) HTML.
+インデックスページ（目次）HTMLを生成します。
 
 ---
 
-## PDF Generation
+## PDF生成
 
 ### `convertToPdf(html: string, options?: PdfConversionOptions): Promise<Buffer>`
 
-Converts HTML to PDF.
+HTMLをPDFに変換します。
 
-**Arguments:**
-- `html` (`string`): HTML content
-- `options` (`PdfConversionOptions`, optional): PDF conversion options
+**引数:**
+- `html` (`string`): HTMLコンテンツ
+- `options` (`PdfConversionOptions`, オプション): PDF変換オプション
 
-**Returns:**
-- `Promise<Buffer>`: PDF binary data
+**戻り値:**
+- `Promise<Buffer>`: PDFバイナリデータ
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { convertToPdf } from 'md-specgen';
@@ -304,50 +302,50 @@ await fs.writeFile('output.pdf', pdfBuffer);
 
 ### `convertMultipleHtmlsToPdf(htmls: string[], options?: PdfConversionOptions): Promise<Buffer>`
 
-Combines multiple HTML files into a single PDF.
+複数のHTMLファイルを1つのPDFに結合します。
 
 ### `extractHeadings(html: string): Heading[]`
 
-Extracts headings from HTML.
+HTMLから見出しを抽出します。
 
 ### `generateToc(headings: Heading[], options?: TocOptions): string`
 
-Generates table of contents HTML from headings.
+見出しから目次HTMLを生成します。
 
 ### `addHeadingIds(html: string): string`
 
-Adds IDs to HTML headings.
+HTMLの見出しにIDを追加します。
 
-### Puppeteer Management
+### Puppeteer管理
 
 #### `initBrowser(options?: PuppeteerOptions): Promise<Browser>`
 
-Initializes Puppeteer browser.
+Puppeteerブラウザを初期化します。
 
 #### `closeBrowser(): Promise<void>`
 
-Closes Puppeteer browser.
+Puppeteerブラウザを閉じます。
 
 #### `getBrowser(): Browser | null`
 
-Gets current browser instance.
+現在のブラウザインスタンスを取得します。
 
 ---
 
-## Mermaid Processing
+## Mermaid処理
 
 ### `convertMermaidToSvg(mermaidCode: string, options?: MermaidConversionOptions): Promise<string>`
 
-Converts Mermaid code to div element + SVG.
+Mermaidコードをdiv要素+SVGに変換します。
 
-**Arguments:**
-- `mermaidCode` (`string`): Mermaid diagram code
-- `options` (`MermaidConversionOptions`, optional): Conversion options
+**引数:**
+- `mermaidCode` (`string`): Mermaidダイアグラムコード
+- `options` (`MermaidConversionOptions`, オプション): 変換オプション
 
-**Returns:**
-- `Promise<string>`: SVG string
+**戻り値:**
+- `Promise<string>`: SVG文字列
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { convertMermaidToSvg } from 'md-specgen';
@@ -365,23 +363,23 @@ const svg = await convertMermaidToSvg(mermaidCode, {
 
 ### `replaceMermaidDiagrams(html: string, options?: MermaidConversionOptions): Promise<string>`
 
-Replaces Mermaid code blocks with SVG in HTML.
+HTML内のMermaidコードブロックをSVGに置換します。
 
 ---
 
-## Image Processing
+## 画像処理
 
 ### `imageToBase64(imagePath: string): Promise<string>`
 
-Converts image file to Base64 Data URI.
+画像ファイルをBase64 Data URIに変換します。
 
-**Arguments:**
-- `imagePath` (`string`): Image file path (absolute path)
+**引数:**
+- `imagePath` (`string`): 画像ファイルパス（絶対パス）
 
-**Returns:**
-- `Promise<string>`: Base64 encoded Data URI
+**戻り値:**
+- `Promise<string>`: Base64エンコードされたData URI
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { imageToBase64 } from 'md-specgen';
@@ -392,16 +390,16 @@ const dataUri = await imageToBase64('/path/to/image.png');
 
 ### `embedImages(html: string, options: ImageEmbedOptions): Promise<string>`
 
-Converts image paths in HTML to Base64.
+HTML内の画像パスをBase64に変換します。
 
-**Arguments:**
-- `html` (`string`): HTML content
-- `options` (`ImageEmbedOptions`): Embedding options
+**引数:**
+- `html` (`string`): HTMLコンテンツ
+- `options` (`ImageEmbedOptions`): 埋め込みオプション
 
-**Returns:**
-- `Promise<string>`: HTML with embedded Base64 images
+**戻り値:**
+- `Promise<string>`: Base64画像を埋め込んだHTML
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { embedImages } from 'md-specgen';
@@ -413,36 +411,36 @@ const result = await embedImages(html, {
 });
 ```
 
-### Security Functions
+### セキュリティ関数
 
 #### `validateImagePath(imagePath: string, allowedDir: string): string`
 
-Validates that image path is within allowed directory (prevents path traversal attacks).
+画像パスが許可されたディレクトリ内にあるか検証します（パストラバーサル攻撃を防ぐ）。
 
 #### `isAllowedImageExtension(filename: string, allowedExtensions?: string[]): boolean`
 
-Checks if image file extension is allowed.
+画像ファイル拡張子が許可されているかチェックします。
 
 #### `sanitizeImagePath(imagePath: string): string`
 
-Sanitizes image path.
+画像パスをサニタイズします。
 
 ---
 
-## LLM Features
+## LLM機能
 
 ### `createLlmClient(provider: 'anthropic' | 'bedrock', options: any): LlmClient`
 
-Creates LLM client.
+LLMクライアントを作成します。
 
-**Arguments:**
-- `provider` (`'anthropic' | 'bedrock'`): LLM provider
-- `options` (`any`): Provider-specific options
+**引数:**
+- `provider` (`'anthropic' | 'bedrock'`): LLMプロバイダー
+- `options` (`any`): プロバイダー固有のオプション
 
-**Returns:**
-- `LlmClient`: LLM client instance
+**戻り値:**
+- `LlmClient`: LLMクライアントインスタンス
 
-**Example:**
+**使用例:**
 
 ```typescript
 import { createLlmClient } from 'md-specgen';
@@ -455,45 +453,45 @@ const client = createLlmClient('anthropic', {
 
 ### `checkMarkdownQuality(markdown: string, client: LlmClient): Promise<QualityCheckResult>`
 
-Checks quality of Markdown document.
+Markdownドキュメントの品質をチェックします。
 
-**Arguments:**
-- `markdown` (`string`): Markdown text
-- `client` (`LlmClient`): LLM client
+**引数:**
+- `markdown` (`string`): Markdownテキスト
+- `client` (`LlmClient`): LLMクライアント
 
-**Returns:**
-- `Promise<QualityCheckResult>`: Quality check result
+**戻り値:**
+- `Promise<QualityCheckResult>`: 品質チェック結果
 
 ### `checkMultipleMarkdownFiles(files: Map<string, string>, client: LlmClient): Promise<Map<string, QualityCheckResult>>`
 
-Checks quality of multiple Markdown files.
+複数のMarkdownファイルの品質をチェックします。
 
 ### `generateFrontmatter(markdown: string, client: LlmClient): Promise<FrontmatterData>`
 
-Automatically generates frontmatter from Markdown.
+MarkdownからFrontmatterを自動生成します。
 
-**Arguments:**
-- `markdown` (`string`): Markdown text
-- `client` (`LlmClient`): LLM client
+**引数:**
+- `markdown` (`string`): Markdownテキスト
+- `client` (`LlmClient`): LLMクライアント
 
-**Returns:**
-- `Promise<FrontmatterData>`: Generated frontmatter data
+**戻り値:**
+- `Promise<FrontmatterData>`: 生成されたFrontmatterデータ
 
 ### `generateTocSuggestion(markdownFiles: Map<string, string>, client: LlmClient): Promise<TocSuggestion>`
 
-Suggests table of contents structure for entire document.
+ドキュメント全体の目次構造を提案します。
 
 ### `generateImageAlt(imagePath: string, client: LlmClient): Promise<string>`
 
-Automatically generates alt attribute text for images.
+画像のalt属性テキストを自動生成します。
 
 ---
 
-## Type Definitions
+## 型定義
 
 ### `Config`
 
-Configuration object type definition.
+設定オブジェクトの型定義です。
 
 ```typescript
 interface Config {
@@ -536,7 +534,7 @@ interface Config {
 
 ### `HtmlConversionOptions`
 
-HTML conversion options type definition.
+HTML変換オプションの型定義です。
 
 ```typescript
 interface HtmlConversionOptions {
@@ -551,7 +549,7 @@ interface HtmlConversionOptions {
 
 ### `HtmlConversionResult`
 
-HTML conversion result type definition.
+HTML変換結果の型定義です。
 
 ```typescript
 interface HtmlConversionResult {
@@ -563,7 +561,7 @@ interface HtmlConversionResult {
 
 ### `TemplateData`
 
-Template data type definition.
+テンプレートデータの型定義です。
 
 ```typescript
 interface TemplateData {
@@ -579,7 +577,7 @@ interface TemplateData {
 
 ### `ImageEmbedOptions`
 
-Image embedding options type definition.
+画像埋め込みオプションの型定義です。
 
 ```typescript
 interface ImageEmbedOptions {
@@ -590,7 +588,7 @@ interface ImageEmbedOptions {
 
 ### `PdfConversionOptions`
 
-PDF conversion options type definition.
+PDF変換オプションの型定義です。
 
 ```typescript
 interface PdfConversionOptions {
@@ -610,7 +608,7 @@ interface PdfConversionOptions {
 
 ### `MermaidConversionOptions`
 
-Mermaid conversion options type definition.
+Mermaid変換オプションの型定義です。
 
 ```typescript
 interface MermaidConversionOptions {
@@ -622,7 +620,7 @@ interface MermaidConversionOptions {
 
 ### `ParsedFrontmatter`
 
-Parsed frontmatter type definition.
+解析済みFrontmatterの型定義です。
 
 ```typescript
 interface ParsedFrontmatter {
@@ -635,7 +633,7 @@ type FrontmatterData = Record<string, any>;
 
 ### `QualityCheckResult`
 
-Quality check result type definition.
+品質チェック結果の型定義です。
 
 ```typescript
 interface QualityCheckResult {
@@ -651,19 +649,19 @@ interface QualityCheckResult {
 
 ---
 
-## Usage Examples
+## 使用例
 
-### Basic Usage
+### 基本的な使用
 
 ```typescript
 import { generate, loadConfig } from 'md-specgen';
 
-// Run with configuration file
+// 設定ファイルから実行
 const config = await loadConfig('./md-specgen.config.json');
 await generate(config);
 ```
 
-### Run with Custom Configuration
+### カスタム設定で実行
 
 ```typescript
 import { generate, getDefaultConfig } from 'md-specgen';
@@ -681,7 +679,7 @@ const config = {
 await generate(config);
 ```
 
-### Convert Markdown to HTML
+### MarkdownをHTMLに変換
 
 ```typescript
 import { convertToHtml } from 'md-specgen';
@@ -699,7 +697,7 @@ const result = await convertToHtml(markdown);
 console.log(result.html);
 ```
 
-### Use LLM Features
+### LLM機能を使用
 
 ```typescript
 import { createLlmClient, checkMarkdownQuality } from 'md-specgen';
@@ -712,7 +710,7 @@ const client = createLlmClient('anthropic', {
 const markdown = `# My Document\n\nContent here...`;
 const quality = await checkMarkdownQuality(markdown, client);
 
-console.log(`Quality score: ${quality.score}`);
+console.log(`品質スコア: ${quality.score}`);
 quality.issues.forEach(issue => {
   console.log(`[${issue.severity}] ${issue.message}`);
 });
@@ -720,9 +718,9 @@ quality.issues.forEach(issue => {
 
 ---
 
-## Error Handling
+## エラーハンドリング
 
-All async functions throw `Error` objects when errors occur.
+全ての非同期関数は、エラー発生時に `Error` オブジェクトをスローします。
 
 ```typescript
 import { loadConfig, generate } from 'md-specgen';
@@ -731,15 +729,15 @@ try {
   const config = await loadConfig('./config.json');
   await generate(config);
 } catch (error) {
-  console.error('An error occurred:', error.message);
+  console.error('エラーが発生しました:', error.message);
 }
 ```
 
 ---
 
-## Support
+## サポート
 
-For more details, please refer to:
+詳細については、以下を参照してください:
 
 - [README.md](../README.md)
 - [GitHub Issues](https://github.com/takemi-ohama/md-specgen/issues)

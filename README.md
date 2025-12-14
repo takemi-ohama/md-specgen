@@ -6,56 +6,58 @@
 
 A flexible Markdown documentation generator with HTML/PDF output and AI-powered enhancements.
 
-## 特徴
+[日本語版 README (Japanese)](./README.ja.md)
 
-- 📝 **Markdown to HTML/PDF**: Markdownファイルを美しいHTMLやPDFドキュメントに変換
-- 🎨 **NumPy風スタイル**: 読みやすく洗練されたデフォルトテンプレート
-- 📊 **Mermaid対応**: ダイアグラムを自動的に画像化
-- 🖼️ **画像埋め込み**: Base64エンコードで画像を埋め込み、単一ファイル出力が可能
-- 🔒 **セキュリティ**: パストラバーサル攻撃を防ぐ画像パス検証
-- 🤖 **AI機能** (オプション): Claude APIを使った品質チェックや自動生成機能
-- ⚙️ **柔軟な設定**: JSON/YAML設定ファイルでカスタマイズ可能
+## Features
 
-## インストール
+- 📝 **Markdown to HTML/PDF**: Convert Markdown files to beautiful HTML or PDF documents
+- 🎨 **NumPy-style Theme**: Clean and sophisticated default template
+- 📊 **Mermaid Support**: Automatically convert diagrams to images
+- 🖼️ **Image Embedding**: Base64 encoding allows single-file output
+- 🔒 **Security**: Image path validation prevents path traversal attacks
+- 🤖 **AI Features** (Optional): Quality checks and auto-generation using Claude API
+- ⚙️ **Flexible Configuration**: Customizable via JSON/YAML configuration files
 
-### NPMから
+## Installation
+
+### From NPM
 
 ```bash
 npm install -g md-specgen
 ```
 
-### ローカルプロジェクトに追加
+### Add to Local Project
 
 ```bash
 npm install --save-dev md-specgen
 ```
 
-## クイックスタート
+## Quick Start
 
-### CLI使用例
+### CLI Usage
 
-最もシンプルな使い方:
+Simplest usage:
 
 ```bash
-# Markdownディレクトリを指定してHTML生成
+# Generate HTML from Markdown directory
 md-specgen --input ./docs --output ./output
 ```
 
-画像を含む場合:
+With images:
 
 ```bash
 md-specgen --input ./docs --output ./output --images ./images
 ```
 
-PDF生成を含む場合:
+With PDF generation:
 
 ```bash
 md-specgen --input ./docs --output ./output --pdf --format A4
 ```
 
-### 設定ファイルを使用
+### Using Configuration File
 
-プロジェクトルートに`md-specgen.config.json`を作成:
+Create `md-specgen.config.json` at project root:
 
 ```json
 {
@@ -71,7 +73,7 @@ md-specgen --input ./docs --output ./output --pdf --format A4
     "format": "A4",
     "includeToc": true,
     "includeCover": true,
-    "coverTitle": "プロジェクト要件定義書",
+    "coverTitle": "Project Requirements Specification",
     "coverSubtitle": "Version 1.0"
   },
   "mermaid": {
@@ -84,41 +86,41 @@ md-specgen --input ./docs --output ./output --pdf --format A4
 }
 ```
 
-設定ファイルを指定して実行:
+Run with configuration file:
 
 ```bash
 md-specgen --config md-specgen.config.json
 ```
 
-## CLIオプション
+## CLI Options
 
-| オプション | 説明 | デフォルト |
-|-----------|------|----------|
-| `--input, -i` | Markdownファイルが格納されたディレクトリ | `./markdown` |
-| `--output, -o` | 出力先ディレクトリ | `./output` |
-| `--images` | 画像ディレクトリ | `./images` |
-| `--config, -c` | 設定ファイルパス | - |
-| `--pdf` | PDF出力を有効化 | `false` |
-| `--format` | PDF用紙サイズ (A4/A3/Letter/Legal) | `A4` |
-| `--llm` | LLM機能を有効化 | `false` |
-| `--llm-provider` | LLMプロバイダー (anthropic/bedrock) | `anthropic` |
-| `--llm-quality-check` | LLMによる品質チェック | `false` |
-| `--llm-auto-index` | 自動インデックス生成 | `false` |
-| `--llm-auto-frontmatter` | 自動Frontmatter生成 | `false` |
-| `--llm-auto-image-alt` | 自動画像alt属性生成 | `false` |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--input, -i` | Directory containing Markdown files | `./markdown` |
+| `--output, -o` | Output directory | `./output` |
+| `--images` | Images directory | `./images` |
+| `--config, -c` | Configuration file path | - |
+| `--pdf` | Enable PDF output | `false` |
+| `--format` | PDF paper size (A4/A3/Letter/Legal) | `A4` |
+| `--llm` | Enable LLM features | `false` |
+| `--llm-provider` | LLM provider (anthropic/bedrock) | `anthropic` |
+| `--llm-quality-check` | LLM quality check | `false` |
+| `--llm-auto-index` | Auto-generate index | `false` |
+| `--llm-auto-frontmatter` | Auto-generate frontmatter | `false` |
+| `--llm-auto-image-alt` | Auto-generate image alt attributes | `false` |
 
-## プログラマブルAPI
+## Programmable API
 
-TypeScript/JavaScriptから使用する場合:
+Use from TypeScript/JavaScript:
 
 ```typescript
 import { generate, loadConfig, getDefaultConfig } from 'md-specgen';
 
-// 設定ファイルから実行
+// Run with configuration file
 const config = await loadConfig('./md-specgen.config.json');
 await generate(config);
 
-// コード内で設定を構築
+// Build configuration in code
 const customConfig = {
   inputDir: './docs',
   outputDir: './build',
@@ -134,7 +136,7 @@ const customConfig = {
 };
 await generate(customConfig);
 
-// デフォルト設定を取得してカスタマイズ
+// Get default config and customize
 const defaultConfig = getDefaultConfig();
 const myConfig = {
   ...defaultConfig,
@@ -144,11 +146,11 @@ const myConfig = {
 await generate(myConfig);
 ```
 
-## 設定ファイル
+## Configuration File
 
-JSON形式（`md-specgen.config.json`）またはYAML形式（`md-specgen.config.yaml`）がサポートされています。
+Both JSON format (`md-specgen.config.json`) and YAML format (`md-specgen.config.yaml`) are supported.
 
-### JSON例
+### JSON Example
 
 ```json
 {
@@ -188,7 +190,7 @@ JSON形式（`md-specgen.config.json`）またはYAML形式（`md-specgen.config
 }
 ```
 
-### YAML例
+### YAML Example
 
 ```yaml
 inputDir: ./markdown
@@ -213,29 +215,29 @@ images:
   embed: true
 ```
 
-## LLM機能（オプション）
+## LLM Features (Optional)
 
-Claude APIを使用した高度な機能を利用できます。
+Advanced features using Claude API.
 
-### 環境変数設定
+### Environment Variables
 
 ```bash
-# Anthropic API使用時
+# When using Anthropic API
 export ANTHROPIC_API_KEY="your-api-key"
 
-# AWS Bedrock使用時
+# When using AWS Bedrock
 export AWS_REGION="us-west-2"
 ```
 
-### LLM機能一覧
+### LLM Features List
 
-- **品質チェック**: ドキュメントの品質、一貫性、完全性をチェック
-- **自動インデックス**: ドキュメントの目次を自動生成
-- **自動Frontmatter**: メタデータを自動生成
-- **自動画像alt属性**: 画像の代替テキストを自動生成（アクセシビリティ向上）
+- **Quality Check**: Verify document quality, consistency, and completeness
+- **Auto Index**: Automatically generate table of contents
+- **Auto Frontmatter**: Automatically generate metadata
+- **Auto Image Alt**: Automatically generate image alt text (improves accessibility)
 
 ```bash
-# LLM機能を全て有効化
+# Enable all LLM features
 md-specgen --input ./docs --output ./output \
   --llm \
   --llm-quality-check \
@@ -244,150 +246,150 @@ md-specgen --input ./docs --output ./output \
   --llm-auto-image-alt
 ```
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 md-specgen/
-├── src/                    # ソースコード
-│   ├── cli/                # CLIインターフェース
-│   ├── core/               # コアエンジン
-│   │   ├── config.ts       # 設定管理
-│   │   ├── generator.ts    # メインジェネレーター
-│   │   └── types.ts        # 型定義
-│   ├── modules/            # 機能モジュール
-│   │   ├── markdown/       # Markdown処理
-│   │   ├── html/           # HTML生成
-│   │   ├── pdf/            # PDF生成
-│   │   ├── mermaid/        # Mermaid処理
-│   │   ├── image/          # 画像処理
-│   │   └── llm/            # LLM統合
-│   └── utils/              # ユーティリティ
-├── tests/                  # テスト
-│   ├── unit/               # ユニットテスト
-│   ├── integration/        # 統合テスト
-│   └── fixtures/           # テスト用データ
-├── examples/               # サンプルプロジェクト
-└── docs/                   # ドキュメント
-    └── API.md              # API詳細ドキュメント
+├── src/                    # Source code
+│   ├── cli/                # CLI interface
+│   ├── core/               # Core engine
+│   │   ├── config.ts       # Configuration management
+│   │   ├── generator.ts    # Main generator
+│   │   └── types.ts        # Type definitions
+│   ├── modules/            # Feature modules
+│   │   ├── markdown/       # Markdown processing
+│   │   ├── html/           # HTML generation
+│   │   ├── pdf/            # PDF generation
+│   │   ├── mermaid/        # Mermaid processing
+│   │   ├── image/          # Image processing
+│   │   └── llm/            # LLM integration
+│   └── utils/              # Utilities
+├── tests/                  # Tests
+│   ├── unit/               # Unit tests
+│   ├── integration/        # Integration tests
+│   └── fixtures/           # Test data
+├── examples/               # Sample projects
+└── docs/                   # Documentation
+    └── API.md              # API detailed documentation
 ```
 
-## 開発
+## Development
 
-### 開発環境
+### Development Environment
 
 - Node.js >= 18.0.0
 - TypeScript 5.7.2
-- Jest (テストフレームワーク)
+- Jest (testing framework)
 
-### 開発コマンド
+### Development Commands
 
 ```bash
-# 依存関係インストール
+# Install dependencies
 npm install
 
-# ビルド
+# Build
 npm run build
 
-# 開発モード（watch）
+# Development mode (watch)
 npm run dev
 
-# テスト実行
+# Run tests
 npm test
 
-# テストカバレッジ
+# Test coverage
 npm run test:coverage
 
 # Lint
 npm run lint
 
-# Lint自動修正
+# Auto-fix lint issues
 npm run lint:fix
 
-# フォーマット
+# Format
 npm run format
 ```
 
-### テスト
+### Testing
 
 ```bash
-# 全テスト実行
+# Run all tests
 npm test
 
-# カバレッジレポート生成
+# Generate coverage report
 npm run test:coverage
 
-# 特定のテストファイルのみ実行
+# Run specific test file only
 npm test -- tests/unit/html/converter.test.ts
 ```
 
-## サンプルプロジェクト
+## Sample Project
 
-`examples/basic/`ディレクトリにサンプルプロジェクトがあります。
+A sample project is available in the `examples/basic/` directory.
 
 ```bash
 cd examples/basic
 md-specgen --config md-specgen.config.json
 ```
 
-## API詳細
+## API Documentation
 
-詳細なAPI仕様は [docs/API.md](./docs/API.md) を参照してください。
+For detailed API specifications, see [docs/API.md](./docs/API.md).
 
-## ライセンス
+## License
 
 MIT License - Copyright (c) 2025 takemi-ohama
 
-詳細は [LICENSE](./LICENSE) ファイルを参照してください。
+See [LICENSE](./LICENSE) file for details.
 
-## 貢献
+## Contributing
 
-貢献を歓迎します！以下の手順でお願いします:
+Contributions are welcome! Please follow these steps:
 
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
-4. ブランチをプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
-### 貢献ガイドライン
+### Contribution Guidelines
 
-- コードスタイルは既存のコードに合わせてください
-- 新機能には必ずテストを追加してください
-- コミットメッセージは明確に記述してください
-- ドキュメントの更新も忘れずに
+- Match code style to existing code
+- Always add tests for new features
+- Write clear commit messages
+- Don't forget to update documentation
 
-## サポート
+## Support
 
-- 🐛 バグ報告: [GitHub Issues](https://github.com/takemi-ohama/md-specgen/issues)
-- 💬 質問・議論: [GitHub Discussions](https://github.com/takemi-ohama/md-specgen/discussions)
-- 📧 メール: [takemi.ohama@example.com](mailto:takemi.ohama@example.com)
+- 🐛 Bug Reports: [GitHub Issues](https://github.com/takemi-ohama/md-specgen/issues)
+- 💬 Questions/Discussion: [GitHub Discussions](https://github.com/takemi-ohama/md-specgen/discussions)
+- 📧 Email: [takemi.ohama@example.com](mailto:takemi.ohama@example.com)
 
-## 変更履歴
+## Changelog
 
 ### v1.0.0 (2025-01-XX)
 
-- 初回リリース
-- Markdown to HTML/PDF変換
-- Mermaid図の自動画像化
-- 画像Base64埋め込み
-- LLM機能（オプション）
-- CLI/プログラマブルAPI
+- Initial release
+- Markdown to HTML/PDF conversion
+- Automatic Mermaid diagram rendering
+- Image Base64 embedding
+- LLM features (optional)
+- CLI/Programmable API
 
-## 関連プロジェクト
+## Related Projects
 
-- [marked](https://github.com/markedjs/marked) - Markdownパーサー
-- [puppeteer](https://github.com/puppeteer/puppeteer) - PDF生成
-- [mermaid](https://github.com/mermaid-js/mermaid) - ダイアグラム生成
+- [marked](https://github.com/markedjs/marked) - Markdown parser
+- [puppeteer](https://github.com/puppeteer/puppeteer) - PDF generation
+- [mermaid](https://github.com/mermaid-js/mermaid) - Diagram generation
 
 ## Credits
 
-このプロジェクトは以下のオープンソースプロジェクトを使用しています:
+This project uses the following open source projects:
 
 - TypeScript
 - Jest
 - ESLint
 - Prettier
-- その他多数（package.jsonを参照）
+- Many others (see package.json)
 
 ---
 

@@ -5,59 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+[日本語版 CHANGELOG (Japanese)](./CHANGELOG.ja.md)
+
 ## [1.0.0] - 2024-12-14
 
-### 🎉 初回リリース
+### 🎉 Initial Release
 
-md-specgenの最初の安定版リリースです。
+First stable release of md-specgen.
 
-### 追加機能
+### Added Features
 
-#### コア機能
-- **Markdownパース**: front-matter対応のMarkdownパーサー
-- **HTML変換**: カスタマイズ可能なHTMLテンプレート生成
-- **PDF生成**: PuppeteerベースのPDF出力（ヘッダー・フッター対応）
-- **画像処理**:
-  - Base64埋め込み
-  - セキュリティスキャン
-  - 外部画像の自動ダウンロード
+#### Core Features
+- **Markdown Parser**: Front-matter compatible Markdown parser
+- **HTML Conversion**: Customizable HTML template generation
+- **PDF Generation**: Puppeteer-based PDF output (header/footer support)
+- **Image Processing**:
+  - Base64 embedding
+  - Security scanning
+  - Automatic external image downloading
 
-#### AI機能
-- **LLMプロバイダー統合**:
+#### AI Features
+- **LLM Provider Integration**:
   - Claude (Anthropic API)
   - AWS Bedrock (Claude on AWS)
-- **AI支援機能**:
-  - ドキュメント強化
-  - コンテンツ生成
-  - 品質改善提案
+- **AI-Assisted Features**:
+  - Document enhancement
+  - Content generation
+  - Quality improvement suggestions
 
-#### 開発者向け機能
-- **TypeScript完全サポート**: 型定義ファイル同梱
-- **柔軟な設定**: YAMLベースの設定ファイル
-- **拡張可能アーキテクチャ**: プラグイン可能な設計
-- **セキュリティ重視**: 入力検証、パス検証、画像スキャン
+#### Developer Features
+- **Full TypeScript Support**: Type definition files included
+- **Flexible Configuration**: YAML-based configuration files
+- **Extensible Architecture**: Plugin-capable design
+- **Security Focus**: Input validation, path validation, image scanning
 
-#### ツール
-- **CLI**: `md-specgen` コマンドラインインターフェース
-- **ログ機能**: 構造化ログとスピナー対応
-- **エラーハンドリング**: 詳細なエラーメッセージ
+#### Tools
+- **CLI**: `md-specgen` command-line interface
+- **Logging**: Structured logging with spinner support
+- **Error Handling**: Detailed error messages
 
-### ドキュメント
-- 包括的なREADME（使用例、設定、API仕様）
-- TypeScript型定義
-- サンプルプロジェクト
+### Documentation
+- Comprehensive README (examples, configuration, API specifications)
+- TypeScript type definitions
+- Sample projects
 
-### テスト
-- Jest統合テスト環境
-- 178テストケース
-- 主要機能のカバレッジ
+### Testing
+- Jest integrated testing environment
+- 178 test cases
+- Coverage of major features
 
-### 技術スタック
-- **言語**: TypeScript 5.7
-- **ランタイム**: Node.js >= 18.0.0
-- **主要ライブラリ**:
-  - marked 15.0 (Markdownパーサー)
-  - puppeteer 23.11 (PDF生成)
+### Technology Stack
+- **Language**: TypeScript 5.7
+- **Runtime**: Node.js >= 18.0.0
+- **Major Libraries**:
+  - marked 15.0 (Markdown parser)
+  - puppeteer 23.11 (PDF generation)
   - @anthropic-ai/sdk 0.38 (Claude AI)
   - @aws-sdk/client-bedrock-runtime 3.712 (AWS Bedrock)
 

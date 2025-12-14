@@ -1,98 +1,100 @@
-# コントリビューションガイド
+# Contributing Guide
 
-md-specgenへのコントリビューションをご検討いただき、ありがとうございます！
-このドキュメントでは、プロジェクトへの貢献方法を説明します。
+Thank you for considering contributing to md-specgen!
+This document explains how to contribute to the project.
 
-## 🤝 貢献方法
+[日本語版 CONTRIBUTING (Japanese)](./CONTRIBUTING.ja.md)
 
-### バグ報告
+## 🤝 How to Contribute
 
-バグを発見した場合は、以下の手順で報告してください：
+### Bug Reports
 
-1. [既存のIssue](https://github.com/takemi-ohama/md-specgen/issues)を確認し、同じ問題が報告されていないか確認
-2. 新しいIssueを作成し、「バグ報告」テンプレートを使用
-3. 以下の情報を含める：
-   - 明確なタイトルと説明
-   - 再現手順
-   - 期待される動作と実際の動作
-   - 環境情報（OS、Node.jsバージョン、md-specgenバージョン）
-   - 可能であればスクリーンショットやエラーログ
+If you find a bug, please report it following these steps:
 
-### 機能リクエスト
+1. Check [existing Issues](https://github.com/takemi-ohama/md-specgen/issues) to see if the same problem has been reported
+2. Create a new Issue using the "Bug Report" template
+3. Include the following information:
+   - Clear title and description
+   - Steps to reproduce
+   - Expected behavior vs actual behavior
+   - Environment information (OS, Node.js version, md-specgen version)
+   - Screenshots or error logs if possible
 
-新機能の提案は大歓迎です：
+### Feature Requests
 
-1. [既存のIssue](https://github.com/takemi-ohama/md-specgen/issues)で同様の提案がないか確認
-2. 「機能リクエスト」テンプレートを使用してIssueを作成
-3. 以下を明確に説明：
-   - 解決したい課題
-   - 提案する解決策
-   - 代替案（あれば）
+New feature proposals are very welcome:
 
-### プルリクエスト
+1. Check [existing Issues](https://github.com/takemi-ohama/md-specgen/issues) for similar proposals
+2. Create an Issue using the "Feature Request" template
+3. Clearly explain:
+   - The problem you want to solve
+   - Your proposed solution
+   - Alternative approaches (if any)
 
-コードの貢献手順：
+### Pull Requests
 
-1. **リポジトリをフォーク**
+Steps for code contributions:
+
+1. **Fork the repository**
    ```bash
    gh repo fork takemi-ohama/md-specgen
    ```
 
-2. **ブランチを作成**
+2. **Create a branch**
    ```bash
    git checkout -b feature/your-feature-name
-   # または
+   # or
    git checkout -b fix/your-bug-fix
    ```
 
-3. **開発環境のセットアップ**
+3. **Set up development environment**
    ```bash
    npm install
    npm run build
    npm test
    ```
 
-4. **変更を実装**
-   - コードスタイルガイドに従う（下記参照）
-   - 適切なテストを追加
-   - ドキュメントを更新
+4. **Implement changes**
+   - Follow code style guide (see below)
+   - Add appropriate tests
+   - Update documentation
 
-5. **テストとリント**
+5. **Test and lint**
    ```bash
    npm run lint
    npm test
    npm run build
    ```
 
-6. **コミット**
+6. **Commit**
    ```bash
    git add .
-   git commit -m "feat: 新機能の説明"
+   git commit -m "feat: description of new feature"
    ```
 
-   コミットメッセージの規約：
-   - `feat:` - 新機能
-   - `fix:` - バグ修正
-   - `docs:` - ドキュメント変更のみ
-   - `style:` - コードの意味に影響しない変更
-   - `refactor:` - リファクタリング
-   - `test:` - テストの追加・修正
-   - `chore:` - ビルドプロセスやツールの変更
+   Commit message conventions:
+   - `feat:` - New feature
+   - `fix:` - Bug fix
+   - `docs:` - Documentation changes only
+   - `style:` - Changes that don't affect code meaning
+   - `refactor:` - Refactoring
+   - `test:` - Adding/modifying tests
+   - `chore:` - Build process or tool changes
 
-7. **プッシュとPR作成**
+7. **Push and create PR**
    ```bash
    git push origin feature/your-feature-name
    ```
 
-   その後、GitHubでPRを作成し、テンプレートに従って記入
+   Then create a PR on GitHub and fill in the template
 
-## 📝 コードスタイルガイド
+## 📝 Code Style Guide
 
 ### TypeScript
 
-- **フォーマット**: Prettierを使用（設定は`.prettierrc`）
-- **リント**: ESLintを使用（設定は`.eslintrc.json`）
-- **型**: 可能な限り明示的な型を使用、`any`は避ける
+- **Format**: Use Prettier (settings in `.prettierrc`)
+- **Lint**: Use ESLint (settings in `.eslintrc.json`)
+- **Types**: Use explicit types whenever possible, avoid `any`
 
 ```typescript
 // ✅ Good
@@ -106,51 +108,51 @@ export async function generatePdf(options: any): Promise<any> {
 }
 ```
 
-### ファイル構造
+### File Structure
 
 ```
 src/
-├── core/          # コアロジック
-├── cli/           # CLIインターフェース
-├── markdown/      # Markdownパーサー
-├── html/          # HTML変換
-├── pdf/           # PDF生成
-├── image/         # 画像処理
-├── llm/           # AI機能
-└── utils/         # ユーティリティ
+├── core/          # Core logic
+├── cli/           # CLI interface
+├── markdown/      # Markdown parser
+├── html/          # HTML conversion
+├── pdf/           # PDF generation
+├── image/         # Image processing
+├── llm/           # AI features
+└── utils/         # Utilities
 ```
 
-### テスト
+### Testing
 
-- **単体テスト**: `tests/unit/` に配置
-- **統合テスト**: `tests/integration/` に配置
-- **カバレッジ**: 新機能は適切なテストでカバー
+- **Unit tests**: Place in `tests/unit/`
+- **Integration tests**: Place in `tests/integration/`
+- **Coverage**: Cover new features with appropriate tests
 
 ```typescript
-// テストファイル例: tests/unit/markdown/parser.test.ts
+// Test file example: tests/unit/markdown/parser.test.ts
 describe('MarkdownParser', () => {
   describe('parse', () => {
     it('should parse markdown with frontmatter', () => {
-      // テストコード
+      // Test code
     });
   });
 });
 ```
 
-### ドキュメント
+### Documentation
 
-- **TSDoc**: 公開APIには必ずTSDocコメントを追加
-- **README**: 新機能はREADMEに例を追加
-- **CHANGELOG**: リリース時に更新
+- **TSDoc**: Always add TSDoc comments to public APIs
+- **README**: Add examples to README for new features
+- **CHANGELOG**: Update on release
 
 ```typescript
 /**
- * Markdownファイルを解析してHTMLに変換します
+ * Parses Markdown files and converts them to HTML
  *
- * @param content - Markdownコンテンツ
- * @param options - 変換オプション
- * @returns 変換されたHTML
- * @throws {ValidationError} 不正な入力の場合
+ * @param content - Markdown content
+ * @param options - Conversion options
+ * @returns Converted HTML
+ * @throws {ValidationError} On invalid input
  *
  * @example
  * ```typescript
@@ -165,65 +167,65 @@ export async function parseMarkdown(
 }
 ```
 
-## 🔍 開発のヒント
+## 🔍 Development Tips
 
-### ローカルでのテスト
+### Local Testing
 
 ```bash
-# ビルド
+# Build
 npm run build
 
-# ローカルのCLIをテスト
+# Test local CLI
 node dist/cli/index.js generate examples/basic/input.md
 
-# ウォッチモード
+# Watch mode
 npm run dev
 ```
 
-### デバッグ
+### Debugging
 
 ```bash
-# デバッグログを有効化
+# Enable debug logs
 DEBUG=md-specgen:* npm test
 ```
 
-### パフォーマンステスト
+### Performance Testing
 
 ```bash
-# 大規模ファイルでのテスト
+# Test with large files
 npm run test:performance
 ```
 
-## 📋 レビュープロセス
+## 📋 Review Process
 
-1. PRが作成されると、自動的にCIが実行されます
-2. すべてのテストがパスする必要があります
-3. メンテナーがコードレビューを行います
-4. 必要に応じて修正をお願いする場合があります
-5. 承認後、メンテナーがマージします
+1. When a PR is created, CI runs automatically
+2. All tests must pass
+3. Maintainers will perform code review
+4. We may request modifications if needed
+5. After approval, maintainers will merge
 
-## 🎯 優先事項
+## 🎯 Priority Areas
 
-現在、特に以下の分野での貢献を歓迎しています：
+We especially welcome contributions in these areas:
 
-- [ ] パフォーマンス最適化
-- [ ] 追加のLLMプロバイダーサポート
-- [ ] ドキュメント改善
-- [ ] テストカバレッジ向上
-- [ ] 国際化（i18n）対応
-- [ ] プラグインシステムの拡張
+- [ ] Performance optimization
+- [ ] Additional LLM provider support
+- [ ] Documentation improvements
+- [ ] Test coverage improvements
+- [ ] Internationalization (i18n) support
+- [ ] Plugin system extensions
 
-## 📜 ライセンス
+## 📜 License
 
-貢献されたコードは、プロジェクトと同じ[MITライセンス](LICENSE)の下で公開されます。
+Contributed code will be published under the same [MIT License](LICENSE) as the project.
 
-## 💬 質問・相談
+## 💬 Questions & Consultation
 
-- **質問**: [GitHub Discussions](https://github.com/takemi-ohama/md-specgen/discussions)を使用
-- **バグ報告**: [GitHub Issues](https://github.com/takemi-ohama/md-specgen/issues)を使用
-- **セキュリティ問題**: 公開Issueではなく、メンテナーに直接連絡してください
+- **Questions**: Use [GitHub Discussions](https://github.com/takemi-ohama/md-specgen/discussions)
+- **Bug Reports**: Use [GitHub Issues](https://github.com/takemi-ohama/md-specgen/issues)
+- **Security Issues**: Contact maintainers directly instead of opening public Issues
 
-## 🙏 謝辞
+## 🙏 Acknowledgments
 
-md-specgenへの貢献を検討してくださり、本当にありがとうございます！
-あなたの貢献が、このプロジェクトをより良いものにします。
+Thank you so much for considering contributing to md-specgen!
+Your contributions make this project better.

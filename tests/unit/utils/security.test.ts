@@ -2,7 +2,7 @@
  * セキュリティユーティリティのテスト
  */
 
-import { sanitizeFilePath, isSafePath, escapeHtml, isSafeFilename } from '../../../src/utils/security';
+import { sanitizeFilePath, isSafePath, escapeHtml, isSafeFilename, encodeFilename } from '../../../src/utils/security';
 
 describe('security utils', () => {
   describe('sanitizeFilePath', () => {
@@ -50,6 +50,22 @@ describe('security utils', () => {
       expect(isSafeFilename('../test.md')).toBe(false);
       expect(isSafeFilename('path/to/file.md')).toBe(false);
       expect(isSafeFilename('file\0.md')).toBe(false);
+    });
+  });
+
+  describe('encodeFilename', () => {
+    it('ファイル名をURLエンコードする', () => {
+      expect(encodeFilename('test file.md')).toBe('test%20file.md');
+      expect(encodeFilename('ファイル.md')).toBe('%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.md');
+    });
+
+    it('特殊文字を含むファイル名を正しくエンコードする', () => {
+      expect(encodeFilename('test&file.md')).toBe('test%26file.md');
+      expect(encodeFilename('test#file.md')).toBe('test%23file.md');
+    });
+
+    it('通常のASCII文字はそのままエンコードする', () => {
+      expect(encodeFilename('test-file_123.md')).toBe('test-file_123.md');
     });
   });
 });

@@ -1,0 +1,27 @@
+{
+  "inputDir": "./docs",
+  "outputDir": "./output",
+  "imagesDir": "./images",
+  "html": {
+    "breadcrumbs": true,
+    "footerText": "© 2024 md-specgen Example Project"
+  },
+  "pdf": {
+    "enabled": false,
+    "format": "A4",
+    "includeToc": true,
+    "includeCover": true,
+    "coverTitle": "サンプルドキュメント",
+    "coverSubtitle": "md-specgen Basic Example"
+  },
+  "mermaid": {
+    "enabled": true,
+    "theme": "default"
+  },
+  "images": {
+    "embed": true
+  },
+  "llm": {
+    "enabled": false
+  }
+}

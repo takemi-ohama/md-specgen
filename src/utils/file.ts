@@ -68,7 +68,10 @@ export async function dirExists(dirPath: string): Promise<boolean> {
 /**
  * 相対パスを絶対パスに変換
  */
-export function resolveAbsolutePath(relativePath: string, basePath: string = process.cwd()): string {
+export function resolveAbsolutePath(
+  relativePath: string,
+  basePath: string = process.cwd()
+): string {
   return path.resolve(basePath, relativePath);
 }
 

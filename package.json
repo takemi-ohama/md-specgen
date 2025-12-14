@@ -1,6 +1,7 @@
 {
   "name": "md-specgen",
   "version": "1.0.0",
+  "type": "module",
   "description": "A flexible Markdown documentation generator with HTML/PDF output and AI-powered enhancements",
   "keywords": [
     "markdown",

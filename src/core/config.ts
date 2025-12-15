@@ -43,6 +43,8 @@ export interface Config {
     coverTitle?: string;
     /** 表紙サブタイトル */
     coverSubtitle?: string;
+    /** フォント名 */
+    font?: string;
   };
   /** Mermaid設定 */
   mermaid?: {
@@ -96,6 +98,7 @@ const DEFAULT_CONFIG: Config = {
     includeToc: true,
     tocLevel: 3,
     includeCover: true,
+    font: 'Noto Sans JP',
   },
   mermaid: {
     enabled: true,
@@ -215,6 +218,16 @@ export function configFromCliArgs(args: any): Partial<Config> {
     if (level >= 1 && level <= 6) {
       config.pdf = { ...config.pdf, tocLevel: level };
     }
+  }
+
+  // --no-toc オプションの処理
+  if (args.toc === false) {
+    config.pdf = { ...config.pdf, includeToc: false };
+  }
+
+  // --font オプションの処理
+  if (args.font) {
+    config.pdf = { ...config.pdf, font: args.font };
   }
 
   // LLMオプションの処理

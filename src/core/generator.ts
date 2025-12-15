@@ -202,6 +202,8 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
 
   // 完全なHTMLドキュメントを生成
   const today = new Date().toLocaleDateString('ja-JP');
+  const fontName = config.pdf?.font || 'Noto Sans JP';
+  const fontNameEncoded = fontName.replace(/\s+/g, '+');
   const fullHtml = `<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -209,7 +211,7 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
     <title>${config.pdf?.coverTitle || 'ドキュメント'}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=${fontNameEncoded}:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* PDF用スタイル */
         @page {
@@ -219,7 +221,7 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
 
         /* 日本語フォント設定 */
         body {
-            font-family: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+            font-family: "${fontName}", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
             font-size: 10pt;
             line-height: 1.7;
             color: #333;

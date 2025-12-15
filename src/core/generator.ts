@@ -14,6 +14,7 @@ import { loadTemplate } from '../modules/html/template.js';
 import { convertToPdf } from '../modules/pdf/converter.js';
 import { extractHeadings, generateToc, addHeadingIds } from '../modules/pdf/toc.js';
 import { replaceMermaidDiagrams } from '../modules/mermaid/converter.js';
+import { closeBrowser } from '../modules/pdf/puppeteer.js';
 import { embedImages } from '../modules/image/embed.js';
 import { parseFrontmatter } from '../modules/markdown/frontmatter.js';
 
@@ -76,8 +77,8 @@ async function processMarkdownFile(
     footerText: config.html?.footerText,
   });
 
-  // 出力パス
-  const outputPath = path.join(config.outputDir, 'html', relativePath.replace(/\.md$/, '.html'));
+  // 出力パス（outputDirに直接出力）
+  const outputPath = path.join(config.outputDir, relativePath.replace(/\.md$/, '.html'));
   await ensureDirectoryExists(outputPath);
 
   // ファイルを保存
@@ -142,7 +143,7 @@ async function generateIndex(config: Config, template?: string): Promise<void> {
     treeView: true,
   });
 
-  const indexPath = path.join(config.outputDir, 'html', 'index.html');
+  const indexPath = path.join(config.outputDir, 'index.html');
   await ensureDirectoryExists(indexPath);
   await fs.writeFile(indexPath, indexHtml, 'utf-8');
 
@@ -193,7 +194,8 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
   let tocHtml = '';
   if (config.pdf?.includeToc) {
     console.log('目次を生成しています...');
-    const headings = extractHeadings(combinedContent);
+    const tocLevel = config.pdf?.tocLevel || 3;
+    const headings = extractHeadings(combinedContent, tocLevel);
     tocHtml = generateToc(headings);
     combinedContent = addHeadingIds(combinedContent, headings);
   }
@@ -205,17 +207,171 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
 <head>
     <meta charset="UTF-8">
     <title>${config.pdf?.coverTitle || 'ドキュメント'}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* PDF用スタイル（省略版） */
+        /* PDF用スタイル */
         @page {
             size: ${config.pdf?.format || 'A4'};
             margin: 25mm 20mm;
         }
-        body { font-family: sans-serif; font-size: 11pt; line-height: 1.7; }
+
+        /* 日本語フォント設定 */
+        body {
+            font-family: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+            font-size: 10pt;
+            line-height: 1.7;
+            color: #333;
+        }
+
         .page-break { page-break-after: always; }
-        h1 { font-size: 22pt; border-bottom: 2px solid #ddd; }
-        h2 { font-size: 18pt; border-bottom: 1px solid #ddd; }
-        h3 { font-size: 14pt; }
+
+        /* 見出しスタイル */
+        h1 {
+            font-size: 20pt;
+            font-weight: 600;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 0.3em;
+            margin-top: 1.5em;
+            color: #1e40af;
+        }
+        h2 {
+            font-size: 16pt;
+            font-weight: 600;
+            border-bottom: 1px solid #93c5fd;
+            padding-bottom: 0.2em;
+            margin-top: 1.3em;
+            color: #1e3a8a;
+        }
+        h3 {
+            font-size: 13pt;
+            font-weight: 600;
+            margin-top: 1.2em;
+            color: #1e3a8a;
+        }
+        h4 {
+            font-size: 11pt;
+            font-weight: 600;
+            margin-top: 1em;
+        }
+
+        /* テーブルスタイル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            font-size: 9pt;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5em 0.75em;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #e0e7ff;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* コードスタイル */
+        pre {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 0.75em;
+            overflow-x: auto;
+            font-size: 8.5pt;
+            line-height: 1.5;
+        }
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+        :not(pre) > code {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 0.1em 0.3em;
+        }
+
+        /* リストスタイル */
+        ul, ol {
+            margin: 0.5em 0;
+            padding-left: 1.5em;
+        }
+        li {
+            margin-bottom: 0.3em;
+        }
+
+        /* 引用スタイル */
+        blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #4b5563;
+            font-style: italic;
+        }
+
+        /* Mermaid図スタイル（拡大禁止、縮小のみ） */
+        .mermaid-svg {
+            text-align: center;
+            margin: 1em 0;
+            overflow: visible;
+        }
+        .mermaid-svg svg {
+            /* 元のサイズを維持、拡大しない */
+            height: auto;
+        }
+
+        /* 水平線 */
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 1.5em 0;
+        }
+
+        /* 段落 */
+        p {
+            margin: 0.5em 0;
+        }
+
+        /* 強調 */
+        strong {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* 目次スタイル */
+        .toc {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 1em;
+            margin-bottom: 2em;
+        }
+        .toc h2 {
+            margin-top: 0;
+            font-size: 14pt;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 0.3em 0;
+        }
+        .toc a {
+            color: #2563eb;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -258,9 +414,8 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
   // HTML生成
   if (!skipHtml) {
     // 出力ディレクトリをクリア
-    const htmlDir = path.join(config.outputDir, 'html');
-    await fs.remove(htmlDir);
-    await fs.ensureDir(htmlDir);
+    await fs.remove(config.outputDir);
+    await fs.ensureDir(config.outputDir);
 
     // テンプレートを読み込み
     let template: string | undefined;
@@ -271,6 +426,24 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
     // Markdownファイルを検索
     const pattern = path.join(config.inputDir, '**/*.md');
     const markdownFiles = await glob(pattern);
+
+    // ファイル名でソート（数値プレフィックスを考慮した自然ソート）
+    markdownFiles.sort((a, b) => {
+      const nameA = path.basename(a);
+      const nameB = path.basename(b);
+
+      // 数値プレフィックスを抽出（例: "00-", "01-"）
+      const numA = nameA.match(/^(\d+)-/);
+      const numB = nameB.match(/^(\d+)-/);
+
+      if (numA && numB) {
+        const diff = parseInt(numA[1], 10) - parseInt(numB[1], 10);
+        if (diff !== 0) return diff;
+      }
+
+      // 数値が同じか、数値プレフィックスがない場合はアルファベット順
+      return nameA.localeCompare(nameB);
+    });
 
     result.markdownCount = markdownFiles.length;
 
@@ -293,6 +466,9 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
     result.pdfFile = await generatePdf(config, result.htmlFiles);
     console.log(`✅ PDF生成完了: ${result.pdfFile}`);
   }
+
+  // Puppeteerブラウザを終了（Mermaid変換で使用した場合）
+  await closeBrowser();
 
   console.log('===== 生成完了 =====');
 

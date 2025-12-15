@@ -35,6 +35,8 @@ export interface Config {
     format?: 'A4' | 'A3' | 'Letter' | 'Legal';
     /** 目次を含めるか */
     includeToc?: boolean;
+    /** 目次の見出しレベル（1-6、デフォルト: 3） */
+    tocLevel?: number;
     /** 表紙を含めるか */
     includeCover?: boolean;
     /** 表紙タイトル */
@@ -92,6 +94,7 @@ const DEFAULT_CONFIG: Config = {
     enabled: false,
     format: 'A4',
     includeToc: true,
+    tocLevel: 3,
     includeCover: true,
   },
   mermaid: {
@@ -205,6 +208,13 @@ export function configFromCliArgs(args: any): Partial<Config> {
 
   if (args.format) {
     config.pdf = { ...config.pdf, format: args.format };
+  }
+
+  if (args.tocLevel) {
+    const level = parseInt(args.tocLevel, 10);
+    if (level >= 1 && level <= 6) {
+      config.pdf = { ...config.pdf, tocLevel: level };
+    }
   }
 
   // LLMオプションの処理

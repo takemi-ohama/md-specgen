@@ -34,7 +34,7 @@ export class MarkdownParser {
   constructor(options: MarkdownParserOptions = {}) {
     this.options = {
       gfm: options.gfm ?? true,
-      breaks: options.breaks ?? false,
+      breaks: options.breaks ?? true,
       highlight: options.highlight ?? true,
     };
 

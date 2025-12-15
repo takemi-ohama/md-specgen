@@ -39,31 +39,75 @@ export async function convertMermaidToSvg(
     const useMaxWidth = options.useMaxWidth ?? true;
 
     // MermaidをレンダリングするHTMLを作成
+    // A4横幅(210mm) - マージン(40mm) = 170mm ≈ 500px を最大幅とする（4ボックスが上限）
+    const maxWidth = 500;
     const html = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
+  <style>
+    body { margin: 0; padding: 0; }
+    .mermaid { max-width: ${maxWidth}px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+  </style>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     mermaid.initialize({
       startOnLoad: true,
       theme: '${theme}',
+      maxTextSize: 50000,
       themeVariables: {
-        fontFamily: '"Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "IPAGothic", "IPAexGothic", "Meiryo", sans-serif'
+        fontFamily: '"Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif',
+        fontSize: '10px',
+        nodeBorder: '1px'
       },
       flowchart: {
-        useMaxWidth: ${useMaxWidth},
-        htmlLabels: true
+        useMaxWidth: true,
+        htmlLabels: true,
+        nodeSpacing: 15,
+        rankSpacing: 25,
+        curve: 'basis',
+        padding: 6,
+        defaultRenderer: 'dagre-wrapper',
+        wrappingWidth: 100
       },
       sequence: {
-        useMaxWidth: ${useMaxWidth}
+        useMaxWidth: true,
+        diagramMarginX: 5,
+        diagramMarginY: 5,
+        actorMargin: 20,
+        width: 80,
+        height: 40,
+        boxMargin: 3,
+        boxTextMargin: 2,
+        noteMargin: 3,
+        messageMargin: 15,
+        mirrorActors: false,
+        showSequenceNumbers: false
+      },
+      er: {
+        useMaxWidth: true,
+        fontSize: 9
+      },
+      gantt: {
+        useMaxWidth: true,
+        fontSize: 9
+      },
+      pie: {
+        useMaxWidth: true
+      },
+      class: {
+        useMaxWidth: true
+      },
+      state: {
+        useMaxWidth: true
       }
     });
   </script>
 </head>
 <body>
-  <div class="mermaid">
+  <div class="mermaid" style="max-width: ${maxWidth}px;">
 ${mermaidCode}
   </div>
 </body>
@@ -75,11 +119,39 @@ ${mermaidCode}
     const timeout = options.timeout || 2000;
     await new Promise((resolve) => setTimeout(resolve, timeout));
 
-    // SVGを取得
-    const svgContent = await page.evaluate(() => {
+    // SVGを取得し、横幅を制限（拡大はしない、縮小のみ）
+    const svgContent = await page.evaluate((maxW: number) => {
       const svg = document.querySelector('svg');
-      return svg ? svg.outerHTML : null;
-    });
+      if (!svg) return null;
+
+      // SVGの現在のサイズを取得
+      const width = svg.getAttribute('width');
+      const height = svg.getAttribute('height');
+      const viewBox = svg.getAttribute('viewBox');
+
+      // 幅が数値の場合、最大幅を超えていたらスケール調整（縮小のみ）
+      if (width && height) {
+        const widthNum = parseFloat(width);
+        const heightNum = parseFloat(height);
+        if (widthNum > maxW) {
+          const scale = maxW / widthNum;
+          const newHeight = heightNum * scale;
+          svg.setAttribute('width', String(maxW));
+          svg.setAttribute('height', String(newHeight));
+          // viewBoxがなければ追加
+          if (!viewBox) {
+            svg.setAttribute('viewBox', '0 0 ' + widthNum + ' ' + heightNum);
+          }
+        }
+        // 元のサイズを保持（拡大防止）- width/heightをそのまま維持
+      }
+
+      // 拡大防止のスタイル（縮小のみ許可）
+      svg.style.maxWidth = svg.getAttribute('width') + 'px';
+      svg.style.height = 'auto';
+
+      return svg.outerHTML;
+    }, maxWidth);
 
     if (!svgContent) {
       throw new Error('Mermaid SVGの生成に失敗しました');

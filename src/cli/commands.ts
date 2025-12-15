@@ -24,6 +24,7 @@ export function registerGenerateCommand(program: Command): void {
     .option('--pdf', 'PDFを生成する')
     .option('--no-pdf', 'PDFを生成しない')
     .option('--format <format>', 'PDF用紙サイズ（A4, A3, Letter, Legal）', 'A4')
+    .option('--toc-level <level>', '目次の見出しレベル（1-6、デフォルト: 3）', '3')
     .option('--skip-html', 'HTML生成をスキップ')
     .option('--skip-pdf', 'PDF生成をスキップ')
     .option('-v, --verbose', '詳細ログを出力')

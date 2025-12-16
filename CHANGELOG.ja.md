@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-16
+
+### 追加
+
+- **PDF生成オプション**:
+  - `--no-toc`: 目次生成をスキップするオプション
+  - `--font`: PDFのフォント指定オプション（デフォルト: Noto Sans JP）
+  - `--toc-level`: 目次の深さレベル設定
+  - Google Fontsの動的読み込みサポート
+
+### 改善
+
+- **PDFスタイリング**:
+  - テーブルの枠線と背景色の強化
+  - 日本語フォント対応（Noto Sans JP統合）
+  - SVG拡大縮小の改善（拡大防止、縮小のみ許可）
+
+- **Mermaid図のレンダリング**:
+  - フォントサイズの最適化
+  - 横幅制限による レイアウト改善
+
+- **ファイル処理**:
+  - 数値プレフィックスの自然ソート
+  - Markdown改行のHTML出力への反映（`breaks: true`）
+  - HTML出力パス構造の修正（html/html/ → html/）
+
+- **安定性**:
+  - Puppeteerブラウザの適切なクリーンアップとリソース管理
+
 ## [1.0.0] - 2024-12-14
 
 ### 🎉 初回リリース

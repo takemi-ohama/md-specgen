@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [日本語版 CHANGELOG (Japanese)](./CHANGELOG.ja.md)
 
+## [1.1.0] - 2025-12-16
+
+### Added
+
+- **PDF Generation Options**:
+  - `--no-toc`: Option to skip table of contents generation
+  - `--font`: Custom font specification for PDF output (default: Noto Sans JP)
+  - `--toc-level`: Configurable table of contents depth level
+  - Dynamic Google Fonts loading support
+
+### Improved
+
+- **PDF Styling**:
+  - Enhanced table borders and background colors
+  - Japanese font support (Noto Sans JP integration)
+  - SVG scaling improvements (prevent enlargement, allow shrinking only)
+
+- **Mermaid Diagram Rendering**:
+  - Font size optimization
+  - Width constraints for better layout
+
+- **File Processing**:
+  - Natural sorting for numbered file prefixes
+  - Markdown line break preservation in HTML output (`breaks: true`)
+  - Fixed HTML output path structure (html/html/ → html/)
+
+- **Stability**:
+  - Proper Puppeteer browser cleanup and resource management
+
 ## [1.0.0] - 2024-12-14
 
 ### 🎉 Initial Release

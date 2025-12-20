@@ -401,7 +401,8 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
  * メイン生成関数
  */
 export async function generate(options: GenerateOptions): Promise<GenerateResult> {
-  const { config, skipHtml = false, skipPdf = false } = options;
+  const { skipHtml = false, skipPdf = false } = options;
+  let config = options.config;
 
   console.log('===== ドキュメント生成開始 =====');
   console.log(`入力: ${config.inputDir}`);
@@ -422,7 +423,8 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
       // 一時ディレクトリを作成
       tempDir = await createTempDir();
       originalOutputDir = config.outputDir;
-      config.outputDir = tempDir;
+      // configのコピーを作成して一時ディレクトリを設定（元のconfigを変更しない）
+      config = { ...config, outputDir: tempDir };
       console.log(`一時ディレクトリを作成しました: ${tempDir}`);
     }
 

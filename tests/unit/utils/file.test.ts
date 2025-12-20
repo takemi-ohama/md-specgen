@@ -327,7 +327,8 @@ describe('file utils', () => {
       const prefix = 'test-prefix-';
       const tempDir = await createTempDir(prefix);
 
-      expect(path.basename(tempDir)).toContain(prefix);
+      // fs.mkdtempはプレフィックス＋ランダムサフィックスを生成するため、パス全体にプレフィックスが含まれることを確認
+      expect(tempDir).toContain(prefix);
 
       // クリーンアップ
       await removeTempDir(tempDir);

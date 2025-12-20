@@ -136,7 +136,8 @@ export async function collectMarkdownFiles(inputPath: string): Promise<string[]>
   } else if (stat.isDirectory()) {
     // ディレクトリパスが指定された場合
     const pattern = path.join(inputPath, '**/*.md');
-    const files = await glob(pattern);
+    // nocaseオプションでUnix系OSでも大文字小文字を区別しない
+    const files = await glob(pattern, { nocase: true });
     return files.map(f => path.resolve(f));
   } else {
     throw new Error(`Invalid input path: ${inputPath}`);
@@ -149,8 +150,8 @@ export async function collectMarkdownFiles(inputPath: string): Promise<string[]>
  * @returns 作成された一時ディレクトリのパス
  */
 export async function createTempDir(prefix: string = 'md-specgen-'): Promise<string> {
-  const tmpDir = path.join(os.tmpdir(), `${prefix}${Date.now()}-${Math.random().toString(36).substring(7)}`);
-  await fs.ensureDir(tmpDir);
+  // fs.mkdtempを使用してセキュアな一時ディレクトリを作成（CWE-377対策）
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
   return tmpDir;
 }
 
@@ -160,8 +161,28 @@ export async function createTempDir(prefix: string = 'md-specgen-'): Promise<str
  */
 export async function removeTempDir(dirPath: string): Promise<void> {
   try {
-    await fs.remove(dirPath);
+    // セキュリティ: 一時ディレクトリ配下であることを検証
+    const resolvedDir = path.resolve(dirPath);
+    const tmpRoot = path.resolve(os.tmpdir());
+
+    const normalizedDir = resolvedDir.endsWith(path.sep) ? resolvedDir : resolvedDir + path.sep;
+    const normalizedTmpRoot = tmpRoot.endsWith(path.sep) ? tmpRoot : tmpRoot + path.sep;
+
+    const isWithinTmp =
+      process.platform === 'win32'
+        ? normalizedDir.toLowerCase().startsWith(normalizedTmpRoot.toLowerCase())
+        : normalizedDir.startsWith(normalizedTmpRoot);
+
+    if (!isWithinTmp) {
+      console.warn(`警告: 一時ディレクトリではないパスの削除要求が拒否されました: ${dirPath}`);
+      return;
+    }
+
+    await fs.remove(resolvedDir);
   } catch (error) {
-    console.warn(`警告: 一時ディレクトリの削除に失敗しました: ${dirPath}`, error);
+    const err = error as NodeJS.ErrnoException;
+    const codeInfo = err.code ? ` (code: ${err.code})` : '';
+    const message = err.message || String(err);
+    console.warn(`警告: 一時ディレクトリの削除に失敗しました: ${dirPath}${codeInfo}. 理由: ${message}`);
   }
 }

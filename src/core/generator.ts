@@ -201,7 +201,6 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
   }
 
   // 完全なHTMLドキュメントを生成
-  const today = new Date().toLocaleDateString('ja-JP');
   const fontName = config.pdf?.font || 'Noto Sans JP';
   const fontNameEncoded = fontName.replace(/\s+/g, '+');
   const fullHtml = `<!DOCTYPE html>
@@ -402,7 +401,7 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
  * メイン生成関数
  */
 export async function generate(options: GenerateOptions): Promise<GenerateResult> {
-  const { config, verbose = false, skipHtml = false, skipPdf = false } = options;
+  const { config, skipHtml = false, skipPdf = false } = options;
 
   console.log('===== ドキュメント生成開始 =====');
   console.log(`入力: ${config.inputDir}`);

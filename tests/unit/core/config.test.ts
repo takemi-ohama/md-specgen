@@ -292,7 +292,7 @@ describe('configFromCliArgs', () => {
   it('PDF関連の引数を処理できる', () => {
     const args = {
       pdf: true,
-      format: 'Letter',
+      format: 'Letter' as const,
     };
 
     const config = configFromCliArgs(args);
@@ -304,7 +304,7 @@ describe('configFromCliArgs', () => {
   it('LLM関連の引数を処理できる', () => {
     const args = {
       llm: true,
-      llmProvider: 'bedrock',
+      llmProvider: 'bedrock' as const,
       llmQualityCheck: true,
       llmAutoIndex: true,
       llmAutoFrontmatter: true,

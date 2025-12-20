@@ -193,12 +193,35 @@ export function mergeConfig(base: Config, override: Partial<Config>): Config {
 }
 
 /**
+ * CLI引数の型定義
+ */
+interface CliArgs {
+  input?: string;
+  output?: string;
+  images?: string;
+  config?: string;
+  noToc?: boolean;
+  toc?: boolean;
+  font?: string;
+  tocLevel?: string;
+  pdf?: boolean;
+  format?: 'A4' | 'A3' | 'Letter' | 'Legal';
+  llm?: boolean;
+  llmProvider?: 'anthropic' | 'bedrock';
+  llmQualityCheck?: boolean;
+  llmAutoIndex?: boolean;
+  llmAutoFrontmatter?: boolean;
+  llmAutoImageAlt?: boolean;
+  [key: string]: unknown;
+}
+
+/**
  * CLI引数から設定を構築
  *
  * @param args CLI引数オブジェクト
  * @returns 設定オブジェクト
  */
-export function configFromCliArgs(args: any): Partial<Config> {
+export function configFromCliArgs(args: CliArgs): Partial<Config> {
   const config: Partial<Config> = {};
 
   if (args.input) config.inputDir = args.input;

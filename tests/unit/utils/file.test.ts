@@ -17,6 +17,10 @@ import {
   getExtension,
   getBasename,
   getDirname,
+  isFile,
+  collectMarkdownFiles,
+  createTempDir,
+  removeTempDir,
 } from '../../../src/utils/file';
 
 describe('file utils', () => {
@@ -193,6 +197,183 @@ describe('file utils', () => {
 
     it('ルートディレクトリの場合', () => {
       expect(getDirname('/file.txt')).toBe('/');
+    });
+  });
+
+  describe('isFile', () => {
+    it('ファイルの場合はtrueを返す', async () => {
+      const testFile = path.join(tmpDir, 'test.txt');
+      await writeFile(testFile, 'test');
+
+      const result = await isFile(testFile);
+      expect(result).toBe(true);
+    });
+
+    it('ディレクトリの場合はfalseを返す', async () => {
+      const testDir = path.join(tmpDir, 'test-dir');
+      await fs.mkdir(testDir);
+
+      const result = await isFile(testDir);
+      expect(result).toBe(false);
+    });
+
+    it('存在しないパスの場合はfalseを返す', async () => {
+      const testPath = path.join(tmpDir, 'not-exists');
+      const result = await isFile(testPath);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('collectMarkdownFiles', () => {
+    it('ファイルパスを指定した場合はそのファイルを返す', async () => {
+      const mdFile = path.join(tmpDir, 'test.md');
+      await writeFile(mdFile, '# Test');
+
+      const files = await collectMarkdownFiles(mdFile);
+      expect(files).toHaveLength(1);
+      expect(files[0]).toBe(path.resolve(mdFile));
+    });
+
+    it('ディレクトリパスを指定した場合は配下の全*.mdファイルを返す', async () => {
+      // テストファイルを作成
+      const subDir = path.join(tmpDir, 'sub');
+      await fs.mkdir(subDir);
+      await writeFile(path.join(tmpDir, 'file1.md'), '');
+      await writeFile(path.join(tmpDir, 'file2.md'), '');
+      await writeFile(path.join(subDir, 'file3.md'), '');
+      await writeFile(path.join(tmpDir, 'file.txt'), '');
+
+      const files = await collectMarkdownFiles(tmpDir);
+      expect(files).toHaveLength(3);
+      expect(files.every(f => f.endsWith('.md'))).toBe(true);
+    });
+
+    it('.mdファイル以外を指定した場合はエラーを投げる', async () => {
+      const txtFile = path.join(tmpDir, 'test.txt');
+      await writeFile(txtFile, 'test');
+
+      await expect(collectMarkdownFiles(txtFile)).rejects.toThrow(
+        'Input file must be a Markdown file (.md)'
+      );
+    });
+
+    it('存在しないパスを指定した場合はエラーを投げる', async () => {
+      const notExistPath = path.join(tmpDir, 'not-exist.md');
+
+      await expect(collectMarkdownFiles(notExistPath)).rejects.toThrow(
+        'Path does not exist'
+      );
+    });
+
+    it('大文字小文字を区別せず.mdファイルを認識する', async () => {
+      const mdFileUpper = path.join(tmpDir, 'test.MD');
+      await writeFile(mdFileUpper, '# Test');
+
+      const files = await collectMarkdownFiles(mdFileUpper);
+      expect(files).toHaveLength(1);
+      expect(files[0]).toBe(path.resolve(mdFileUpper));
+    });
+
+    it('混合ケースの拡張子も認識する', async () => {
+      const mdFileMixed = path.join(tmpDir, 'test.Md');
+      await writeFile(mdFileMixed, '# Test');
+
+      const files = await collectMarkdownFiles(mdFileMixed);
+      expect(files).toHaveLength(1);
+      expect(files[0]).toBe(path.resolve(mdFileMixed));
+    });
+
+    it('権限エラーの場合は適切なエラーメッセージを返す', async () => {
+      // Note: This test requires Unix-like OS and may need to be skipped on Windows
+      if (process.platform === 'win32') {
+        return; // Skip on Windows
+      }
+
+      const restrictedDir = path.join(tmpDir, 'restricted');
+      await fs.mkdir(restrictedDir);
+      const restrictedFile = path.join(restrictedDir, 'test.md');
+      await writeFile(restrictedFile, '# Test');
+      
+      // Remove read permissions from directory
+      await fs.chmod(restrictedDir, 0o000);
+
+      try {
+        await expect(collectMarkdownFiles(restrictedFile)).rejects.toThrow(
+          'Permission denied'
+        );
+      } finally {
+        // Restore permissions for cleanup
+        await fs.chmod(restrictedDir, 0o755);
+      }
+    });
+  });
+
+  describe('createTempDir', () => {
+    it('一時ディレクトリを作成できる', async () => {
+      const tempDir = await createTempDir();
+
+      // ディレクトリが存在するか確認
+      const exists = await dirExists(tempDir);
+      expect(exists).toBe(true);
+
+      // OS一時ディレクトリ配下にあることを確認
+      expect(tempDir).toContain(os.tmpdir());
+
+      // クリーンアップ
+      await removeTempDir(tempDir);
+    });
+
+    it('カスタムプレフィックスを使用できる', async () => {
+      const prefix = 'test-prefix-';
+      const tempDir = await createTempDir(prefix);
+
+      expect(path.basename(tempDir)).toContain(prefix);
+
+      // クリーンアップ
+      await removeTempDir(tempDir);
+    });
+
+    it('複数回呼び出すと異なるディレクトリを作成する', async () => {
+      const tempDir1 = await createTempDir();
+      const tempDir2 = await createTempDir();
+
+      expect(tempDir1).not.toBe(tempDir2);
+
+      // クリーンアップ
+      await removeTempDir(tempDir1);
+      await removeTempDir(tempDir2);
+    });
+  });
+
+  describe('removeTempDir', () => {
+    it('一時ディレクトリを削除できる', async () => {
+      const tempDir = await createTempDir();
+      await writeFile(path.join(tempDir, 'test.txt'), 'test');
+
+      await removeTempDir(tempDir);
+
+      const exists = await dirExists(tempDir);
+      expect(exists).toBe(false);
+    });
+
+    it('存在しないディレクトリを削除してもエラーにならない', async () => {
+      const notExistPath = path.join(tmpDir, 'not-exist-temp');
+
+      // エラーを投げずに完了することを期待
+      await expect(removeTempDir(notExistPath)).resolves.toBeUndefined();
+    });
+
+    it('ファイルを含むディレクトリを削除できる', async () => {
+      const tempDir = await createTempDir();
+      const subDir = path.join(tempDir, 'sub');
+      await fs.mkdir(subDir);
+      await writeFile(path.join(tempDir, 'file1.txt'), 'test1');
+      await writeFile(path.join(subDir, 'file2.txt'), 'test2');
+
+      await removeTempDir(tempDir);
+
+      const exists = await dirExists(tempDir);
+      expect(exists).toBe(false);
     });
   });
 });

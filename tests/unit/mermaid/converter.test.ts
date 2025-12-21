@@ -5,6 +5,9 @@
 import { replaceMermaidDiagrams } from '../../../src/modules/mermaid/converter';
 
 describe('replaceMermaidDiagrams', () => {
+  // Mermaid変換はブラウザ起動が必要なため、タイムアウトを長めに設定
+  jest.setTimeout(15000);
+
   describe('HTMLタグとエンティティのデコード', () => {
     it('シンタックスハイライトのspanタグを除去できる', async () => {
       const html = `

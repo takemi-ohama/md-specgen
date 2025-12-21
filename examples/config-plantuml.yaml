@@ -1,0 +1,11 @@
+inputDir: ./examples/plantuml-example.md
+outputDir: ./output-plantuml
+pdf:
+  enabled: true
+  format: A4
+  includeToc: false
+  includeCover: false
+plantuml:
+  enabled: true
+  server: https://www.plantuml.com/plantuml
+  format: png

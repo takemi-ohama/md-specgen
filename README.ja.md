@@ -10,8 +10,14 @@ A flexible Markdown documentation generator with HTML/PDF output and AI-powered 
 
 - 📝 **Markdown to HTML/PDF**: Markdownファイルを美しいHTMLやPDFドキュメントに変換
 - 🎨 **NumPy風スタイル**: 読みやすく洗練されたデフォルトテンプレート
-- 📊 **Mermaid対応**: ダイアグラムを自動的に画像化
+- 📄 **高度なPDFオプション**: ページ向き、カスタムマージン、ヘッダー・フッター
+- 📦 **カスタムコンテナ**: 警告、情報、ヒントなどの視覚的な強調表示 (:::warning, :::info, :::tip など)
+- 📊 **Mermaid対応**: Mermaidダイアグラムを自動的にSVG画像化
+- 🎯 **PlantUML対応**: PlantUMLダイアグラムを公式サーバー経由でPNG/SVGに変換
+- 👀 **Watchモード**: ファイル変更を監視して自動再生成
 - 🖼️ **画像埋め込み**: Base64エンコードで画像を埋め込み、単一ファイル出力が可能
+- 📎 **ファイルインクルード**: 外部ファイルをMarkdownに埋め込み
+- 🔗 **自動アンカー**: markdown-it-anchorによる見出しへの自動アンカーリンク
 - 🔒 **セキュリティ**: パストラバーサル攻撃を防ぐ画像パス検証
 - 🤖 **AI機能** (オプション): Claude APIを使った品質チェックや自動生成機能
 - ⚙️ **柔軟な設定**: JSON/YAML設定ファイルでカスタマイズ可能
@@ -39,6 +45,9 @@ npm install --save-dev md-specgen
 ```bash
 # Markdownディレクトリを指定してHTML生成
 md-specgen --input ./docs --output ./output
+
+# または、単一のMarkdownファイルから生成
+md-specgen --input ./docs/README.md --output ./output
 ```
 
 画像を含む場合:
@@ -69,6 +78,16 @@ md-specgen --input ./docs --output ./output --pdf --format A4
   "pdf": {
     "enabled": true,
     "format": "A4",
+    "orientation": "portrait",
+    "margin": {
+      "top": "30mm",
+      "bottom": "30mm",
+      "left": "25mm",
+      "right": "25mm"
+    },
+    "displayHeaderFooter": true,
+    "headerTemplate": "<div style=\"font-size: 9px; text-align: center; width: 100%;\"><span class=\"title\"></span></div>",
+    "footerTemplate": "<div style=\"font-size: 9px; text-align: center; width: 100%; color: #666;\"><span class=\"pageNumber\"></span> / <span class=\"totalPages\"></span></div>",
     "includeToc": true,
     "includeCover": true,
     "coverTitle": "プロジェクト要件定義書",
@@ -94,12 +113,13 @@ md-specgen --config md-specgen.config.json
 
 | オプション | 説明 | デフォルト |
 |-----------|------|----------|
-| `--input, -i` | Markdownファイルが格納されたディレクトリ | `./markdown` |
+| `--input, -i` | Markdownファイルのディレクトリまたはファイルパス | `./markdown` |
 | `--output, -o` | 出力先ディレクトリ | `./output` |
 | `--images` | 画像ディレクトリ | `./images` |
 | `--config, -c` | 設定ファイルパス | - |
 | `--pdf` | PDF出力を有効化 | `false` |
 | `--format` | PDF用紙サイズ (A4/A3/Letter/Legal) | `A4` |
+| `--watch, -w` | ファイル変更を監視して自動再生成 | `false` |
 | `--llm` | LLM機能を有効化 | `false` |
 | `--llm-provider` | LLMプロバイダー (anthropic/bedrock) | `anthropic` |
 | `--llm-quality-check` | LLMによる品質チェック | `false` |
@@ -363,6 +383,29 @@ MIT License - Copyright (c) 2025 takemi-ohama
 - 📧 メール: [takemi.ohama@example.com](mailto:takemi.ohama@example.com)
 
 ## 変更履歴
+
+### v2.0.0 (2025-01-XX)
+
+- **新機能**: Watchモード - ファイル変更を監視して自動再生成（`--watch`オプション）
+- **改善**: 自動再生成による開発ワークフローの向上
+- **改善**: Watchモードのグレースフルシャットダウン対応
+
+### v1.4.0 (2025-01-XX)
+
+- **破壊的変更**: より良いプラグインエコシステムサポートのため、`marked`から`markdown-it`に移行
+- **新機能**: カスタムコンテナサポート（:::warning, :::info, :::tip, :::danger, :::note, :::success）
+- **新機能**: markdown-it-includeによるファイルインクルード機能
+- **新機能**: markdown-it-anchorによる自動見出しアンカー
+- **新機能**: PlantUMLダイアグラムサポート（公式サーバー経由でPNG/SVG出力）
+- **改善**: Markdown処理機能の強化
+- **改善**: markdown-itプラグインシステムによる拡張性の向上
+
+### v1.3.0 (2025-01-XX)
+
+- **新機能**: 高度なPDFオプション - ページ向き（portrait/landscape）
+- **新機能**: カスタムPDFマージン（上下左右）
+- **新機能**: PDFヘッダー・フッターのテンプレート対応
+- **改善**: より柔軟なPDFカスタマイズオプション
 
 ### v1.0.0 (2025-01-XX)
 

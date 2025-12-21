@@ -1,0 +1,52 @@
+# 高度なPDF設定の例
+inputDir: ./markdown
+outputDir: ./output
+imagesDir: ./images
+
+html:
+  breadcrumbs: true
+  footerText: "Copyright © 2025"
+
+pdf:
+  enabled: true
+  format: A4
+  
+  # ページ向き（portrait: 縦、landscape: 横）
+  orientation: portrait
+  
+  # マージン設定（CSS単位で指定可能）
+  margin:
+    top: 30mm
+    bottom: 30mm
+    left: 25mm
+    right: 25mm
+  
+  # ヘッダー・フッター設定
+  displayHeaderFooter: true
+  headerTemplate: |-
+    <div style="font-size: 9px; text-align: center; width: 100%;">
+      <span class="title"></span>
+    </div>
+  footerTemplate: |-
+    <div style="font-size: 9px; text-align: center; width: 100%; color: #666;">
+      <span class="pageNumber"></span> / <span class="totalPages"></span>
+    </div>
+  
+  # 目次設定
+  includeToc: true
+  tocLevel: 3
+  
+  # 表紙設定
+  includeCover: true
+  coverTitle: "技術ドキュメント"
+  coverSubtitle: "v1.0.0"
+  
+  # フォント設定
+  font: "Noto Sans JP"
+
+mermaid:
+  enabled: true
+  theme: default
+
+images:
+  embed: true

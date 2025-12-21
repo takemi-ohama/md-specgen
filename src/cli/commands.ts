@@ -8,6 +8,7 @@ import { Command } from 'commander';
 import path from 'path';
 import { loadConfig, getDefaultConfig, mergeConfig, configFromCliArgs } from '../core/config.js';
 import { generate } from '../core/generator.js';
+import { startWatchMode, setupGracefulShutdown } from '../modules/watch/watcher.js';
 
 /**
  * generateコマンド
@@ -29,6 +30,7 @@ export function registerGenerateCommand(program: Command): void {
     .option('--font <font>', 'PDFフォント名（例: "Noto Sans JP"）')
     .option('--skip-html', 'HTML生成をスキップ')
     .option('--skip-pdf', 'PDF生成をスキップ')
+    .option('-w, --watch', 'ファイル変更を監視して自動再生成')
     .option('-v, --verbose', '詳細ログを出力')
     // LLMオプション
     .option('--llm', 'LLM機能を有効化')
@@ -59,7 +61,23 @@ export function registerGenerateCommand(program: Command): void {
           config.imagesDir = path.resolve(config.imagesDir);
         }
 
-        // 生成実行
+        // Watchモードの場合
+        if (options.watch) {
+          const watcher = await startWatchMode({
+            config,
+            verbose: options.verbose,
+          });
+          setupGracefulShutdown(watcher);
+          // Watchモードは、ウォッチャーが閉じるかプロセスが終了シグナルを受け取るまで待機
+          // Graceful shutdown handles process termination
+          // This promise will never resolve naturally, but that's intentional for watch mode
+          await new Promise<void>(() => {
+            // Infinite wait - process will be terminated by signals (SIGINT, SIGTERM)
+          });
+          return;
+        }
+
+        // 通常の生成実行
         const result = await generate({
           config,
           verbose: options.verbose,

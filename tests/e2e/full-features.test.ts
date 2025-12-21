@@ -25,7 +25,11 @@ describe('E2E Test: All Features', () => {
     if (fs.existsSync(outputDir)) {
       fs.rmSync(outputDir, { recursive: true, force: true });
     }
-  });
+
+    // すべてのテストで使用するファイルを事前に生成
+    const config = await loadConfig(configPath);
+    await generate({ config });
+  }, 60000); // タイムアウト60秒（PlantUML変換に時間がかかる可能性がある）
 
   afterAll(() => {
     // テスト後のクリーンアップ（オプション）
@@ -46,20 +50,19 @@ describe('E2E Test: All Features', () => {
     expect(config.plantuml?.enabled).toBe(true);
   });
 
-  test('HTML/PDFファイルが生成される', async () => {
-    const config = await loadConfig(configPath);
-    
-    // 生成実行
-    await generate({ config });
-
+  test('HTML/PDFファイルが生成される', () => {
     // HTMLファイルの存在確認
     expect(fs.existsSync(htmlFile)).toBe(true);
-    
+
     // PDFファイルの存在確認
     expect(fs.existsSync(pdfFile)).toBe(true);
-  }, 60000); // タイムアウト60秒（PlantUML変換に時間がかかる可能性がある）
+  });
 
   test('HTMLに基本的なMarkdown要素が含まれる', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // 見出し
@@ -84,6 +87,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('HTMLにカスタムコンテナが含まれる（Phase 3）', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // カスタムコンテナの各タイプを確認
@@ -101,6 +108,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('HTMLにMermaidダイアグラムが画像として含まれる', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // Mermaid SVG画像が埋め込まれていることを確認
@@ -111,6 +122,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('HTMLにPlantUMLダイアグラムが画像として含まれる（Phase 4）', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // PlantUML画像が埋め込まれていることを確認
@@ -123,6 +138,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('PDFファイルが有効なPDFである（Phase 1 & 2）', () => {
+    if (!fs.existsSync(pdfFile)) {
+      throw new Error('PDF file not found. Run the generation test first.');
+    }
+
     const pdfBuffer = fs.readFileSync(pdfFile);
     
     // PDFの基本的な検証
@@ -134,6 +153,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('生成されたHTMLファイルのサイズが妥当である', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const stats = fs.statSync(htmlFile);
     
     // HTMLファイルサイズが10KB以上あることを確認
@@ -142,6 +165,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('生成されたPDFファイルのサイズが妥当である', () => {
+    if (!fs.existsSync(pdfFile)) {
+      throw new Error('PDF file not found. Run the generation test first.');
+    }
+
     const stats = fs.statSync(pdfFile);
     
     // PDFファイルサイズが50KB以上あることを確認
@@ -150,6 +177,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('HTMLにリンクと引用が含まれる', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // リンク
@@ -162,6 +193,10 @@ describe('E2E Test: All Features', () => {
   });
 
   test('HTMLに実装フェーズのまとめが含まれる', () => {
+    if (!fs.existsSync(htmlFile)) {
+      throw new Error('HTML file not found. Run the generation test first.');
+    }
+
     const html = fs.readFileSync(htmlFile, 'utf-8');
 
     // 各フェーズの記述を確認

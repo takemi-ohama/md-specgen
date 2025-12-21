@@ -378,6 +378,17 @@ MIT License - Copyright (c) 2025 takemi-ohama
 
 See [LICENSE](./LICENSE) file for details.
 
+## Acknowledgments
+
+This project was inspired by and incorporates ideas from the following excellent projects:
+
+- [vscode-markdown-pdf](https://github.com/yzane/vscode-markdown-pdf) by yzane
+  - PDF header/footer customization
+  - Page orientation and margin settings
+  - Extended markdown-it plugins support
+
+We are grateful for their contributions to the Markdown ecosystem.
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:

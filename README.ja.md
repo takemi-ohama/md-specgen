@@ -359,6 +359,17 @@ MIT License - Copyright (c) 2025 takemi-ohama
 
 詳細は [LICENSE](./LICENSE) ファイルを参照してください。
 
+## 謝辞
+
+このプロジェクトは、以下の優れたプロジェクトからインスピレーションを得て、アイデアを取り入れています:
+
+- [vscode-markdown-pdf](https://github.com/yzane/vscode-markdown-pdf) by yzane
+  - PDFヘッダー・フッターのカスタマイズ
+  - ページ向きとマージン設定
+  - 拡張markdown-itプラグインサポート
+
+Markdownエコシステムへの貢献に感謝します。
+
 ## 貢献
 
 貢献を歓迎します！以下の手順でお願いします:

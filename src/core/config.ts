@@ -12,7 +12,7 @@ import yaml from 'js-yaml';
  * 設定オブジェクトの型定義
  */
 export interface Config {
-  /** 入力ディレクトリ（Markdownファイルが格納されている） */
+  /** 入力パス（Markdownファイルのディレクトリまたはファイルパス） */
   inputDir: string;
   /** 出力ディレクトリ（HTML/PDFを出力） */
   outputDir: string;
@@ -33,6 +33,8 @@ export interface Config {
     enabled?: boolean;
     /** 用紙サイズ */
     format?: 'A4' | 'A3' | 'Letter' | 'Legal';
+    /** ページ向き */
+    orientation?: 'portrait' | 'landscape';
     /** 目次を含めるか */
     includeToc?: boolean;
     /** 目次の見出しレベル（1-6、デフォルト: 3） */
@@ -45,6 +47,19 @@ export interface Config {
     coverSubtitle?: string;
     /** フォント名 */
     font?: string;
+    /** マージン設定 */
+    margin?: {
+      top?: string;
+      bottom?: string;
+      left?: string;
+      right?: string;
+    };
+    /** ヘッダー・フッターを表示するか */
+    displayHeaderFooter?: boolean;
+    /** ヘッダーテンプレート（HTML） */
+    headerTemplate?: string;
+    /** フッターテンプレート（HTML） */
+    footerTemplate?: string;
   };
   /** Mermaid設定 */
   mermaid?: {
@@ -52,6 +67,15 @@ export interface Config {
     enabled?: boolean;
     /** テーマ */
     theme?: 'default' | 'dark' | 'forest' | 'neutral';
+  };
+  /** PlantUML設定 */
+  plantuml?: {
+    /** PlantUML図を変換するか */
+    enabled?: boolean;
+    /** PlantUMLサーバーURL */
+    server?: string;
+    /** 画像フォーマット */
+    format?: 'png' | 'svg';
   };
   /** 画像埋め込み設定 */
   images?: {
@@ -95,14 +119,27 @@ const DEFAULT_CONFIG: Config = {
   pdf: {
     enabled: false,
     format: 'A4',
+    orientation: 'portrait',
     includeToc: true,
     tocLevel: 3,
     includeCover: true,
     font: 'Noto Sans JP',
+    margin: {
+      top: '25mm',
+      bottom: '25mm',
+      left: '20mm',
+      right: '20mm',
+    },
+    displayHeaderFooter: false,
   },
   mermaid: {
     enabled: true,
     theme: 'default',
+  },
+  plantuml: {
+    enabled: false,
+    server: 'https://www.plantuml.com/plantuml',
+    format: 'png',
   },
   images: {
     embed: true,
@@ -180,6 +217,10 @@ export function mergeConfig(base: Config, override: Partial<Config>): Config {
     mermaid: {
       ...base.mermaid,
       ...override.mermaid,
+    },
+    plantuml: {
+      ...base.plantuml,
+      ...override.plantuml,
     },
     images: {
       ...base.images,

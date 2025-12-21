@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown拡張機能のデモ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        /* NumPy風スタイル */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+
+        :root {
+            --body-color: rgb(34, 40, 50);
+            --link-color: #0d6efd;
+            --link-hover-color: #0a58ca;
+            --heading-color: rgb(18, 24, 34);
+            --body-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --font-family-base: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            --font-family-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            color: var(--body-color);
+            background-color: var(--body-bg);
+            font-size: 16px;
+            line-height: 1.65;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            color: var(--body-color);
+        }
+
+        .breadcrumb a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: var(--border-color);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-family-heading);
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.625rem;
+            margin-top: 0;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 2rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--link-hover-color);
+            text-decoration: underline;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: var(--font-family-code);
+            font-size: 0.875em;
+        }
+
+        :not(pre) > code {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--sidebar-bg);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--sidebar-bg);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--link-color);
+            padding-left: 1rem;
+            margin-left: 0;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        /* カスタムコンテナスタイル */
+        
+.custom-container {
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  border-left: 4px solid;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.custom-container-title {
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1em;
+}
+
+.custom-container.warning {
+  border-left-color: #ff9800;
+  background-color: #fff3e0;
+}
+
+.custom-container.warning .custom-container-title {
+  color: #e65100;
+}
+
+.custom-container.info {
+  border-left-color: #2196f3;
+  background-color: #e3f2fd;
+}
+
+.custom-container.info .custom-container-title {
+  color: #0d47a1;
+}
+
+.custom-container.tip {
+  border-left-color: #4caf50;
+  background-color: #e8f5e9;
+}
+
+.custom-container.tip .custom-container-title {
+  color: #1b5e20;
+}
+
+.custom-container.danger {
+  border-left-color: #f44336;
+  background-color: #ffebee;
+}
+
+.custom-container.danger .custom-container-title {
+  color: #b71c1c;
+}
+
+.custom-container.note {
+  border-left-color: #9e9e9e;
+  background-color: #f5f5f5;
+}
+
+.custom-container.note .custom-container-title {
+  color: #424242;
+}
+
+.custom-container.success {
+  border-left-color: #4caf50;
+  background-color: #e8f5e9;
+}
+
+.custom-container.success .custom-container-title {
+  color: #1b5e20;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <nav class="breadcrumb">
+            <a href="index.html">ホーム</a>
+            <span class="breadcrumb-separator">/</span>markdown-features
+        </nav>
+  
+
+        <article>
+            <h1 id="markdown%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%AE%E3%83%87%E3%83%A2" tabindex="-1"><a class="header-anchor" href="#markdown%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%AE%E3%83%87%E3%83%A2">Markdown拡張機能のデモ</a></h1>
+<p>このドキュメントは、md-specgenで利用可能な拡張Markdown機能を紹介します。</p>
+<h2 id="%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">カスタムコンテナ</a></h2>
+<p>カスタムコンテナを使用すると、重要な情報を視覚的に強調できます。</p>
+<h3 id="%E6%83%85%E5%A0%B1%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E6%83%85%E5%A0%B1%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">情報コンテナ</a></h3>
+<div class="custom-container info">
+<p class="custom-container-title">情報</p>
+<p>これは情報コンテナです。一般的な情報やヒントを表示するのに適しています。</p>
+</div>
+<div class="custom-container info">
+<p class="custom-container-title">カスタムタイトル</p>
+<p>タイトルをカスタマイズすることもできます。</p>
+</div>
+<h3 id="%E8%AD%A6%E5%91%8A%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E8%AD%A6%E5%91%8A%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">警告コンテナ</a></h3>
+<div class="custom-container warning">
+<p class="custom-container-title">警告</p>
+<p>警告！この操作は慎重に行う必要があります。</p>
+</div>
+<div class="custom-container warning">
+<p class="custom-container-title">注意事項</p>
+<p>データを削除する前に必ずバックアップを取ってください。</p>
+</div>
+<h3 id="%E3%83%92%E3%83%B3%E3%83%88%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E3%83%92%E3%83%B3%E3%83%88%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">ヒントコンテナ</a></h3>
+<div class="custom-container tip">
+<p class="custom-container-title">ヒント</p>
+<p>プロのヒント：ショートカットキーを使うと作業が効率化されます。</p>
+</div>
+<h3 id="%E5%8D%B1%E9%99%BA%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E5%8D%B1%E9%99%BA%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">危険コンテナ</a></h3>
+<div class="custom-container danger">
+<p class="custom-container-title">危険</p>
+<p>危険！この操作は元に戻すことができません。</p>
+</div>
+<div class="custom-container danger">
+<p class="custom-container-title">重要な警告</p>
+<p>本番環境では絶対にこのコマンドを実行しないでください。</p>
+</div>
+<h3 id="%E6%B3%A8%E6%84%8F%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E6%B3%A8%E6%84%8F%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">注意コンテナ</a></h3>
+<div class="custom-container note">
+<p class="custom-container-title">注意</p>
+<p>注：このバージョンは実験的な機能を含んでいます。</p>
+</div>
+<h3 id="%E6%88%90%E5%8A%9F%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A" tabindex="-1"><a class="header-anchor" href="#%E6%88%90%E5%8A%9F%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A">成功コンテナ</a></h3>
+<div class="custom-container success">
+<p class="custom-container-title">成功</p>
+<p>成功！設定が正常に保存されました。</p>
+</div>
+<h2 id="%E3%82%B7%E3%83%B3%E3%82%BF%E3%83%83%E3%82%AF%E3%82%B9%E3%83%8F%E3%82%A4%E3%83%A9%E3%82%A4%E3%83%88" tabindex="-1"><a class="header-anchor" href="#%E3%82%B7%E3%83%B3%E3%82%BF%E3%83%83%E3%82%AF%E3%82%B9%E3%83%8F%E3%82%A4%E3%83%A9%E3%82%A4%E3%83%88">シンタックスハイライト</a></h2>
+<p>コードブロックにはシンタックスハイライトが適用されます。</p>
+<h3 id="typescript" tabindex="-1"><a class="header-anchor" href="#typescript">TypeScript</a></h3>
+<pre><code class="language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">User</span> {
+  <span class="hljs-attr">id</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">email</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">greetUser</span>(<span class="hljs-params"><span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${user.name}</span>!`</span>;
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span> = {
+  <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Alice&#x27;</span>,
+  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;alice@example.com&#x27;</span>
+};
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">greetUser</span>(user));
+</code></pre>
+<h3 id="python" tabindex="-1"><a class="header-anchor" href="#python">Python</a></h3>
+<pre><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">calculate_factorial</span>(<span class="hljs-params">n</span>):
+    <span class="hljs-string">&quot;&quot;&quot;階乗を計算する関数&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> n == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> n == <span class="hljs-number">1</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> n * calculate_factorial(n - <span class="hljs-number">1</span>)
+
+<span class="hljs-comment"># 使用例</span>
+result = calculate_factorial(<span class="hljs-number">5</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;5の階乗は <span class="hljs-subst">{result}</span> です&quot;</span>)
+</code></pre>
+<h3 id="bash" tabindex="-1"><a class="header-anchor" href="#bash">Bash</a></h3>
+<pre><code class="language-bash"><span class="hljs-meta">#!/bin/bash</span>
+
+<span class="hljs-comment"># ファイルをバックアップ</span>
+<span class="hljs-function"><span class="hljs-title">backup_file</span></span>() {
+    <span class="hljs-built_in">local</span> file=<span class="hljs-variable">$1</span>
+    <span class="hljs-built_in">local</span> backup=<span class="hljs-string">&quot;<span class="hljs-variable">${file}</span>.backup.<span class="hljs-subst">$(date +%Y%m%d_%H%M%S)</span>&quot;</span>
+    <span class="hljs-built_in">cp</span> <span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$backup</span>&quot;</span>
+    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;バックアップを作成しました: <span class="hljs-variable">$backup</span>&quot;</span>
+}
+
+backup_file <span class="hljs-string">&quot;important-data.txt&quot;</span>
+</code></pre>
+<h2 id="%E8%A1%A8%E7%B5%84%E3%81%BF" tabindex="-1"><a class="header-anchor" href="#%E8%A1%A8%E7%B5%84%E3%81%BF">表組み</a></h2>
+<table>
+<thead>
+<tr>
+<th>機能</th>
+<th>説明</th>
+<th>ステータス</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>カスタムコンテナ</td>
+<td>情報を視覚的に強調</td>
+<td>✅ 実装済み</td>
+</tr>
+<tr>
+<td>シンタックスハイライト</td>
+<td>コードの色分け表示</td>
+<td>✅ 実装済み</td>
+</tr>
+<tr>
+<td>ファイルインクルード</td>
+<td>外部ファイルの埋め込み</td>
+<td>✅ 実装済み</td>
+</tr>
+<tr>
+<td>PlantUML</td>
+<td>UMLダイアグラム生成</td>
+<td>🔜 予定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="%E3%83%AA%E3%82%B9%E3%83%88%E3%81%A8%E5%BC%95%E7%94%A8" tabindex="-1"><a class="header-anchor" href="#%E3%83%AA%E3%82%B9%E3%83%88%E3%81%A8%E5%BC%95%E7%94%A8">リストと引用</a></h2>
+<h3 id="%E7%95%AA%E5%8F%B7%E4%BB%98%E3%81%8D%E3%83%AA%E3%82%B9%E3%83%88" tabindex="-1"><a class="header-anchor" href="#%E7%95%AA%E5%8F%B7%E4%BB%98%E3%81%8D%E3%83%AA%E3%82%B9%E3%83%88">番号付きリスト</a></h3>
+<ol>
+<li>最初のステップ
+<ul>
+<li>サブ項目A</li>
+<li>サブ項目B</li>
+</ul>
+</li>
+<li>次のステップ</li>
+<li>最後のステップ</li>
+</ol>
+<h3 id="%E5%BC%95%E7%94%A8" tabindex="-1"><a class="header-anchor" href="#%E5%BC%95%E7%94%A8">引用</a></h3>
+<blockquote>
+<p>これは引用文です。重要な情報や参照を表示するのに使用します。</p>
+<p>複数行にわたる引用も可能です。</p>
+</blockquote>
+<h2 id="%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%A8%E7%94%BB%E5%83%8F" tabindex="-1"><a class="header-anchor" href="#%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%A8%E7%94%BB%E5%83%8F">リンクと画像</a></h2>
+<ul>
+<li><a href="https://github.com/takemi-ohama/md-specgen">公式ドキュメント</a></li>
+<li><a href="https://www.markdownguide.org/">マークダウンガイド</a></li>
+</ul>
+<h2 id="%E8%A4%87%E9%9B%91%E3%81%AA%E4%BE%8B" tabindex="-1"><a class="header-anchor" href="#%E8%A4%87%E9%9B%91%E3%81%AA%E4%BE%8B">複雑な例</a></h2>
+<div class="custom-container warning">
+<p class="custom-container-title">開発環境セットアップ</p>
+<p>開発を開始する前に、以下の手順を完了してください：</p>
+<ol>
+<li>Node.js 18以上をインストール</li>
+<li>依存関係をインストール：<pre><code class="language-bash">npm install
+</code></pre>
+</li>
+<li>ビルドを実行：<pre><code class="language-bash">npm run build
+</code></pre>
+</li>
+</ol>
+<div class="custom-container tip">
+<p class="custom-container-title">ヒント</p>
+<p>初回ビルドには時間がかかる場合があります。</p>
+</div>
+</div>
+<p>:::</p>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81" tabindex="-1"><a class="header-anchor" href="#%E3%81%BE%E3%81%A8%E3%82%81">まとめ</a></h2>
+<div class="custom-container success">
+<p class="custom-container-title">成功</p>
+<p>これらの機能を組み合わせることで、美しく読みやすいドキュメントを作成できます！</p>
+</div>
+
+        </article>
+
+        
+    </div>
+</body>
+</html>

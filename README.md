@@ -12,8 +12,14 @@ A flexible Markdown documentation generator with HTML/PDF output and AI-powered 
 
 - 📝 **Markdown to HTML/PDF**: Convert Markdown files to beautiful HTML or PDF documents
 - 🎨 **NumPy-style Theme**: Clean and sophisticated default template
-- 📊 **Mermaid Support**: Automatically convert diagrams to images
+- 📄 **Advanced PDF Options**: Page orientation, custom margins, headers/footers
+- 📦 **Custom Containers**: Visual callouts for warnings, info, tips, and more (:::warning, :::info, :::tip, etc.)
+- 📊 **Mermaid Support**: Automatically convert Mermaid diagrams to SVG images
+- 🎯 **PlantUML Support**: Convert PlantUML diagrams to PNG/SVG via official server
+- 👀 **Watch Mode**: Automatically regenerate on file changes
 - 🖼️ **Image Embedding**: Base64 encoding allows single-file output
+- 📎 **File Include**: Include external files in your markdown
+- 🔗 **Auto Anchors**: Automatic heading anchor links with markdown-it-anchor
 - 🔒 **Security**: Image path validation prevents path traversal attacks
 - 🤖 **AI Features** (Optional): Quality checks and auto-generation using Claude API
 - ⚙️ **Flexible Configuration**: Customizable via JSON/YAML configuration files
@@ -41,6 +47,9 @@ Simplest usage:
 ```bash
 # Generate HTML from Markdown directory
 md-specgen --input ./docs --output ./output
+
+# Or generate from a single Markdown file
+md-specgen --input ./docs/README.md --output ./output
 ```
 
 With images:
@@ -71,6 +80,16 @@ Create `md-specgen.config.json` at project root:
   "pdf": {
     "enabled": true,
     "format": "A4",
+    "orientation": "portrait",
+    "margin": {
+      "top": "30mm",
+      "bottom": "30mm",
+      "left": "25mm",
+      "right": "25mm"
+    },
+    "displayHeaderFooter": true,
+    "headerTemplate": "<div style=\"font-size: 9px; text-align: center; width: 100%;\"><span class=\"title\"></span></div>",
+    "footerTemplate": "<div style=\"font-size: 9px; text-align: center; width: 100%; color: #666;\"><span class=\"pageNumber\"></span> / <span class=\"totalPages\"></span></div>",
     "includeToc": true,
     "includeCover": true,
     "coverTitle": "Project Requirements Specification",
@@ -96,12 +115,13 @@ md-specgen --config md-specgen.config.json
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--input, -i` | Directory containing Markdown files | `./markdown` |
+| `--input, -i` | Directory or file path containing Markdown files | `./markdown` |
 | `--output, -o` | Output directory | `./output` |
 | `--images` | Images directory | `./images` |
 | `--config, -c` | Configuration file path | - |
 | `--pdf` | Enable PDF output | `false` |
 | `--format` | PDF paper size (A4/A3/Letter/Legal) | `A4` |
+| `--watch, -w` | Watch for file changes and automatically regenerate | `false` |
 | `--llm` | Enable LLM features | `false` |
 | `--llm-provider` | LLM provider (anthropic/bedrock) | `anthropic` |
 | `--llm-quality-check` | LLM quality check | `false` |
@@ -165,6 +185,16 @@ Both JSON format (`md-specgen.config.json`) and YAML format (`md-specgen.config.
   "pdf": {
     "enabled": false,
     "format": "A4",
+    "orientation": "portrait",
+    "margin": {
+      "top": "25mm",
+      "bottom": "25mm",
+      "left": "20mm",
+      "right": "20mm"
+    },
+    "displayHeaderFooter": false,
+    "headerTemplate": "",
+    "footerTemplate": "",
     "includeToc": true,
     "includeCover": true,
     "coverTitle": "Document Title",
@@ -204,6 +234,13 @@ html:
 pdf:
   enabled: false
   format: A4
+  orientation: portrait
+  margin:
+    top: 25mm
+    bottom: 25mm
+    left: 20mm
+    right: 20mm
+  displayHeaderFooter: false
   includeToc: true
   includeCover: true
 
@@ -365,6 +402,29 @@ Contributions are welcome! Please follow these steps:
 - 📧 Email: [takemi.ohama@example.com](mailto:takemi.ohama@example.com)
 
 ## Changelog
+
+### v2.0.0 (2025-01-XX)
+
+- **New**: Watch mode - automatically regenerate on file changes (`--watch` option)
+- **Enhancement**: Improved development workflow with automatic regeneration
+- **Enhancement**: Graceful shutdown handling for watch mode
+
+### v1.4.0 (2025-01-XX)
+
+- **Breaking**: Migrated from `marked` to `markdown-it` for better plugin ecosystem support
+- **New**: PlantUML diagram support (PNG/SVG output via official server)
+- **New**: Custom container support (:::warning, :::info, :::tip, :::danger, :::note, :::success)
+- **New**: File include functionality with markdown-it-include
+- **New**: Automatic heading anchors with markdown-it-anchor
+- **Enhancement**: Enhanced Markdown processing capabilities
+- **Enhancement**: Improved extensibility with markdown-it plugin system
+
+### v1.3.0 (2025-01-XX)
+
+- **New**: Advanced PDF options - page orientation (portrait/landscape)
+- **New**: Custom PDF margins (top, bottom, left, right)
+- **New**: PDF headers and footers with template support
+- **Enhancement**: More flexible PDF customization options
 
 ### v1.0.0 (2025-01-XX)
 

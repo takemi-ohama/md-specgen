@@ -15,6 +15,8 @@ import path from 'path';
 export interface PdfConversionOptions {
   /** 用紙サイズ（デフォルト: A4） */
   format?: 'A4' | 'A3' | 'Letter' | 'Legal';
+  /** ページ向き（デフォルト: portrait） */
+  orientation?: 'portrait' | 'landscape';
   /** 背景を印刷するか */
   printBackground?: boolean;
   /** ヘッダー/フッターを表示するか */
@@ -77,6 +79,7 @@ export async function convertToPdf(
     const pdfOptions: PDFOptions = {
       path: outputPath,
       format: options.format || 'A4',
+      landscape: options.orientation === 'landscape',
       printBackground: options.printBackground ?? true,
       displayHeaderFooter: options.displayHeaderFooter ?? false,
       preferCSSPageSize: true,

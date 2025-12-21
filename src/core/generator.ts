@@ -14,6 +14,7 @@ import { convertToPdf } from '../modules/pdf/converter.js';
 import { extractHeadings, generateToc, addHeadingIds } from '../modules/pdf/toc.js';
 import { collectMarkdownFiles, isFile, createTempDir, removeTempDir } from '../utils/file.js';
 import { replaceMermaidDiagrams } from '../modules/mermaid/converter.js';
+import { replacePlantUMLDiagrams } from '../modules/plantuml/converter.js';
 import { closeBrowser } from '../modules/pdf/puppeteer.js';
 import { embedImages } from '../modules/image/embed.js';
 import { parseFrontmatter } from '../modules/markdown/frontmatter.js';
@@ -187,6 +188,15 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
     console.log('Mermaid図をSVGに変換しています...');
     combinedContent = await replaceMermaidDiagrams(combinedContent, {
       theme: config.mermaid.theme,
+    });
+  }
+
+  // PlantUML図を変換
+  if (config.plantuml?.enabled) {
+    console.log('PlantUML図を画像に変換しています...');
+    combinedContent = await replacePlantUMLDiagrams(combinedContent, {
+      server: config.plantuml.server,
+      format: config.plantuml.format,
     });
   }
 
@@ -389,6 +399,11 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
   const pdfPath = path.join(config.outputDir, 'document.pdf');
   await convertToPdf(tempHtmlPath, pdfPath, {
     format: config.pdf?.format,
+    orientation: config.pdf?.orientation,
+    margin: config.pdf?.margin,
+    displayHeaderFooter: config.pdf?.displayHeaderFooter,
+    headerTemplate: config.pdf?.headerTemplate,
+    footerTemplate: config.pdf?.footerTemplate,
   });
 
   // 一時ファイルを削除

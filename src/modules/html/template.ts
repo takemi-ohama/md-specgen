@@ -6,6 +6,7 @@
 
 import fs from 'fs-extra';
 import path from 'path';
+import { CONTAINER_STYLES } from '../markdown/parser.js';
 
 /**
  * テンプレートデータの型定義
@@ -206,6 +207,9 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
             font-size: 0.875rem;
             color: #6c757d;
         }
+
+        /* カスタムコンテナスタイル */
+        ${CONTAINER_STYLES}
     </style>
 </head>
 <body>

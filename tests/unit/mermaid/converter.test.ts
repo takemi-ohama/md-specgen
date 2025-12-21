@@ -13,7 +13,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -30,7 +29,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -45,7 +43,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -60,7 +57,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -76,7 +72,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -93,7 +88,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -111,7 +105,6 @@ describe('replaceMermaidDiagrams', () => {
       `;
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
@@ -126,25 +119,11 @@ describe('replaceMermaidDiagrams', () => {
       const html = '<p>通常のHTML</p>';
 
       const result = await replaceMermaidDiagrams(html, {
-        enabled: true,
         theme: 'default',
       });
 
       expect(result).toBe(html);
     });
 
-    it('Mermaidが無効の場合は元のHTMLを返す', async () => {
-      const html = `
-        <pre><code class="language-mermaid">graph TD
-    A --&gt; B</code></pre>
-      `;
-
-      const result = await replaceMermaidDiagrams(html, {
-        enabled: false,
-        theme: 'default',
-      });
-
-      expect(result).toBe(html);
-    });
   });
 });

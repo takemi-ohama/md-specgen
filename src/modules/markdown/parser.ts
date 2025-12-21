@@ -13,8 +13,6 @@ import markdownItContainer from 'markdown-it-container';
 import markdownItInclude from 'markdown-it-include';
 import markdownItAnchor from 'markdown-it-anchor';
 import hljs from 'highlight.js';
-import * as path from 'path';
-import * as fs from 'fs';
 
 /**
  * Markdownパーサーの設定オプション
@@ -98,7 +96,10 @@ export class MarkdownParser {
         root: this.options.includeBasePath,
         bracesAreOptional: false,
         // セキュリティ: パストラバーサル攻撃を防止
-        includeRe: /^[^.\/\\].*$/,
+        // - 先頭のドット（隠しファイル）を禁止
+        // - 先頭のスラッシュ（絶対パス）を禁止
+        // - パス中の ".." （ディレクトリトラバーサル）を禁止
+        includeRe: /^(?!.*\.\.)(?![\/\\])[^.].*$/,
         // ファイル読み込みのカスタムハンドラー
         getRootDir: () => this.options.includeBasePath || process.cwd(),
       });
@@ -122,6 +123,9 @@ export class MarkdownParser {
     ];
 
     // 各コンテナタイプを登録
+    // Note: markdown-it-containerの型定義とmarkdown-itの型に互換性の問題があるため
+    // 'as any'が必要です。これは型システムの制限であり、実行時には問題なく動作します。
+    // 将来的に型定義が更新されれば、この型アサーションは削除できます。
     containerTypes.forEach(({ name, defaultTitle }) => {
       (md.use as any)(markdownItContainer, name, {
         validate: (params: string) => {

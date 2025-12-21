@@ -64,7 +64,7 @@ async function processMarkdownFile(
 ): Promise<string> {
   console.log(`処理中: ${relativePath}`);
 
-  const fileContent = await fs.readFile(filePath, 'utf-8');
+  let fileContent = await fs.readFile(filePath, 'utf-8');
 
   // パンくずリストを生成
   const breadcrumbs = config.html?.breadcrumbs
@@ -72,11 +72,26 @@ async function processMarkdownFile(
     : undefined;
 
   // HTMLに変換
-  const result = await convertToHtml(fileContent, {
+  let result = await convertToHtml(fileContent, {
     template,
     breadcrumbs,
     footerText: config.html?.footerText,
   });
+
+  // Mermaid図を変換（HTML出力時も適用）
+  if (config.mermaid?.enabled) {
+    result.html = await replaceMermaidDiagrams(result.html, {
+      theme: config.mermaid.theme,
+    });
+  }
+
+  // PlantUML図を変換（HTML出力時も適用）
+  if (config.plantuml?.enabled) {
+    result.html = await replacePlantUMLDiagrams(result.html, {
+      server: config.plantuml.server,
+      format: config.plantuml.format,
+    });
+  }
 
   // 出力パス（outputDirに直接出力）
   const outputPath = path.join(config.outputDir, relativePath.replace(/\.md$/, '.html'));

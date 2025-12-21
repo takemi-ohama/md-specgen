@@ -41,3 +41,7 @@ temp/
 
 # Puppeteer
 .local-chromium/
+
+# 生成ファイル（出力ディレクトリ）
+output/
+output-*/

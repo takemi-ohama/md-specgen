@@ -68,8 +68,12 @@ export function registerGenerateCommand(program: Command): void {
             verbose: options.verbose,
           });
           setupGracefulShutdown(watcher);
-          // Watchモードは終了しないのでここで待機
-          await new Promise(() => {}); // 無限待機
+          // Watchモードは、ウォッチャーが閉じるかプロセスが終了シグナルを受け取るまで待機
+          // Graceful shutdown handles process termination
+          // This promise will never resolve naturally, but that's intentional for watch mode
+          await new Promise<void>(() => {
+            // Infinite wait - process will be terminated by signals (SIGINT, SIGTERM)
+          });
           return;
         }
 

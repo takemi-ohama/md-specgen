@@ -147,7 +147,8 @@ export class MarkdownWatcher {
       console.log('👀 変更を監視中... (Ctrl+C で終了)');
     } catch (error) {
       console.error('❌ 再生成に失敗しました:', error);
-      throw error;
+      // Watch mode should continue running even if regeneration fails
+      // エラーログを表示するが、プロセスは継続する
     } finally {
       this.isRegenerating = false;
     }
@@ -193,15 +194,20 @@ export function setupGracefulShutdown(watcher: MarkdownWatcher): void {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 
   // エラー時のクリーンアップ
-  process.on('uncaughtException', async (error) => {
-    console.error('❌ 予期しないエラー:', error);
-    await watcher.stop();
-    process.exit(1);
-  });
+  // 既存のハンドラがある場合はスキップ
+  if (process.listenerCount('uncaughtException') === 0) {
+    process.on('uncaughtException', async (error) => {
+      console.error('❌ 予期しないエラー:', error);
+      await watcher.stop();
+      process.exit(1);
+    });
+  }
 
-  process.on('unhandledRejection', async (reason) => {
-    console.error('❌ 未処理のPromise拒否:', reason);
-    await watcher.stop();
-    process.exit(1);
-  });
+  if (process.listenerCount('unhandledRejection') === 0) {
+    process.on('unhandledRejection', async (reason) => {
+      console.error('❌ 未処理のPromise拒否:', reason);
+      await watcher.stop();
+      process.exit(1);
+    });
+  }
 }

@@ -165,7 +165,6 @@ export async function replacePlantUMLDiagrams(
 
   for (const plantUMLMatch of matches) {
     try {
-      const format = options.format || 'png';
       const dataUrl = await convertPlantUMLToDataUrl(plantUMLMatch.code, options);
 
       // 画像をHTMLに埋め込む

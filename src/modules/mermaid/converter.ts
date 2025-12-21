@@ -182,14 +182,19 @@ export async function replaceMermaidDiagrams(
   let match;
 
   while ((match = mermaidRegex.exec(html)) !== null) {
+    let decodedCode = match[1]
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+    
+    // シンタックスハイライトのHTMLタグを除去
+    decodedCode = decodedCode.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+    decodedCode = decodedCode.trim();
+    
     matches.push({
       fullMatch: match[0],
-      code: match[1]
-        .replace(/&quot;/g, '"')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&')
-        .trim(),
+      code: decodedCode,
     });
   }
 

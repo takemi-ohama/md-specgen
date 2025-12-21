@@ -194,20 +194,16 @@ export function setupGracefulShutdown(watcher: MarkdownWatcher): void {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 
   // エラー時のクリーンアップ
-  // 既存のハンドラがある場合はスキップ
-  if (process.listenerCount('uncaughtException') === 0) {
-    process.on('uncaughtException', async (error) => {
-      console.error('❌ 予期しないエラー:', error);
-      await watcher.stop();
-      process.exit(1);
-    });
-  }
+  // prependListenerを使用して、このWatcher専用のクリーンアップを必ず実行
+  process.prependListener('uncaughtException', async (error) => {
+    console.error('❌ 予期しないエラー:', error);
+    await watcher.stop();
+    process.exit(1);
+  });
 
-  if (process.listenerCount('unhandledRejection') === 0) {
-    process.on('unhandledRejection', async (reason) => {
-      console.error('❌ 未処理のPromise拒否:', reason);
-      await watcher.stop();
-      process.exit(1);
-    });
-  }
+  process.prependListener('unhandledRejection', async (reason) => {
+    console.error('❌ 未処理のPromise拒否:', reason);
+    await watcher.stop();
+    process.exit(1);
+  });
 }

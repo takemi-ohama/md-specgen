@@ -7,6 +7,12 @@
 
 import plantumlEncoder from 'plantuml-encoder';
 
+// PlantUML diagram container styles
+const PLANTUML_DIAGRAM_STYLE = 'text-align: center; margin: 1rem 0;';
+const PLANTUML_IMAGE_STYLE = 'max-width: 100%; height: auto;';
+const PLANTUML_PLACEHOLDER_STYLE =
+  'background: #f5f5f5; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin: 1rem 0;';
+
 /**
  * PlantUML変換オプション
  */
@@ -136,9 +142,8 @@ export async function replacePlantUMLDiagrams(
   // HTMLエスケープされたPlantUMLコードブロックを抽出
   const plantUMLRegex = /<pre><code class="language-plantuml">([\s\S]*?)<\/code><\/pre>/g;
   const matches: Array<{ fullMatch: string; code: string }> = [];
-  let match;
 
-  while ((match = plantUMLRegex.exec(html)) !== null) {
+  for (const match of html.matchAll(plantUMLRegex)) {
     let decodedCode = match[1]
       .replace(/&quot;/g, '"')
       .replace(/&lt;/g, '<')
@@ -170,8 +175,8 @@ export async function replacePlantUMLDiagrams(
       // 画像をHTMLに埋め込む
       result = result.replace(
         plantUMLMatch.fullMatch,
-        `<div class="plantuml-diagram" style="text-align: center; margin: 1rem 0;">
-  <img src="${dataUrl}" alt="PlantUML Diagram" style="max-width: 100%; height: auto;" />
+        `<div class="plantuml-diagram" style="${PLANTUML_DIAGRAM_STYLE}">
+  <img src="${dataUrl}" alt="PlantUML Diagram" style="${PLANTUML_IMAGE_STYLE}" />
 </div>`
       );
     } catch (error) {
@@ -180,7 +185,7 @@ export async function replacePlantUMLDiagrams(
       // エラー時はプレースホルダーを表示
       result = result.replace(
         plantUMLMatch.fullMatch,
-        '<div class="plantuml-placeholder" style="background: #f5f5f5; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin: 1rem 0;"><p><em>【PlantUML図】レンダリングに失敗しました</em></p></div>'
+        `<div class="plantuml-placeholder" style="${PLANTUML_PLACEHOLDER_STYLE}"><p><em>【PlantUML図】レンダリングに失敗しました</em></p></div>`
       );
     }
   }

@@ -6,13 +6,13 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import { glob } from 'glob';
 import { Config } from './config.js';
 import { convertToHtml, generateBreadcrumbs } from '../modules/html/converter.js';
 import { generateIndexPage, IndexEntry } from '../modules/html/index-page.js';
 import { loadTemplate } from '../modules/html/template.js';
 import { convertToPdf } from '../modules/pdf/converter.js';
 import { extractHeadings, generateToc, addHeadingIds } from '../modules/pdf/toc.js';
+import { collectMarkdownFiles, isFile, createTempDir, removeTempDir } from '../utils/file.js';
 import { replaceMermaidDiagrams } from '../modules/mermaid/converter.js';
 import { closeBrowser } from '../modules/pdf/puppeteer.js';
 import { embedImages } from '../modules/image/embed.js';
@@ -401,7 +401,8 @@ async function generatePdf(config: Config, htmlFiles: string[]): Promise<string>
  * メイン生成関数
  */
 export async function generate(options: GenerateOptions): Promise<GenerateResult> {
-  const { config, skipHtml = false, skipPdf = false } = options;
+  const { skipHtml = false, skipPdf = false } = options;
+  let config = options.config;
 
   console.log('===== ドキュメント生成開始 =====');
   console.log(`入力: ${config.inputDir}`);
@@ -412,66 +413,105 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
     markdownCount: 0,
   };
 
-  // HTML生成
-  if (!skipHtml) {
-    // 出力ディレクトリをクリア
-    await fs.remove(config.outputDir);
-    await fs.ensureDir(config.outputDir);
+  // PDF単体出力の場合は一時ディレクトリを使用
+  const useTempDir = skipHtml && !skipPdf && config.pdf?.enabled;
+  let tempDir: string | undefined;
+  let originalOutputDir: string | undefined;
 
-    // テンプレートを読み込み
-    let template: string | undefined;
-    if (config.html?.template) {
-      template = await loadTemplate(config.html.template);
+  try {
+    if (useTempDir) {
+      // 一時ディレクトリを作成
+      tempDir = await createTempDir();
+      originalOutputDir = config.outputDir;
+      // configのコピーを作成して一時ディレクトリを設定（元のconfigを変更しない）
+      config = { ...config, outputDir: tempDir };
+      console.log(`一時ディレクトリを作成しました: ${tempDir}`);
     }
 
-    // Markdownファイルを検索
-    const pattern = path.join(config.inputDir, '**/*.md');
-    const markdownFiles = await glob(pattern);
+    // HTML生成
+    if (!skipHtml || useTempDir) {
+      // 出力ディレクトリをクリア
+      await fs.remove(config.outputDir);
+      await fs.ensureDir(config.outputDir);
 
-    // ファイル名でソート（数値プレフィックスを考慮した自然ソート）
-    markdownFiles.sort((a, b) => {
-      const nameA = path.basename(a);
-      const nameB = path.basename(b);
-
-      // 数値プレフィックスを抽出（例: "00-", "01-"）
-      const numA = nameA.match(/^(\d+)-/);
-      const numB = nameB.match(/^(\d+)-/);
-
-      if (numA && numB) {
-        const diff = parseInt(numA[1], 10) - parseInt(numB[1], 10);
-        if (diff !== 0) return diff;
+      // テンプレートを読み込み
+      let template: string | undefined;
+      if (config.html?.template) {
+        template = await loadTemplate(config.html.template);
       }
 
-      // 数値が同じか、数値プレフィックスがない場合はアルファベット順
-      return nameA.localeCompare(nameB);
-    });
+      // Markdownファイルを収集（ディレクトリまたはファイルパス対応）
+      const markdownFiles = await collectMarkdownFiles(config.inputDir);
 
-    result.markdownCount = markdownFiles.length;
+      // ファイル名でソート（数値プレフィックスを考慮した自然ソート）
+      markdownFiles.sort((a, b) => {
+        const nameA = path.basename(a);
+        const nameB = path.basename(b);
 
-    // 各ファイルを処理
-    for (const file of markdownFiles) {
-      const relativePath = path.relative(config.inputDir, file);
-      const htmlFile = await processMarkdownFile(file, relativePath, config, template);
-      result.htmlFiles.push(htmlFile);
+        // 数値プレフィックスを抽出（例: "00-", "01-"）
+        const numA = nameA.match(/^(\d+)-/);
+        const numB = nameB.match(/^(\d+)-/);
+
+        if (numA && numB) {
+          const diff = parseInt(numA[1], 10) - parseInt(numB[1], 10);
+          if (diff !== 0) return diff;
+        }
+
+        // 数値が同じか、数値プレフィックスがない場合はアルファベット順
+        return nameA.localeCompare(nameB);
+      });
+
+      result.markdownCount = markdownFiles.length;
+
+      // 入力パスがディレクトリかファイルかを判定
+      const inputIsFile = await isFile(config.inputDir);
+
+      // 各ファイルを処理
+      for (const file of markdownFiles) {
+        // 入力がファイルの場合は、そのファイル自体を基準にする
+        const baseDir = inputIsFile ? path.dirname(config.inputDir) : config.inputDir;
+        const relativePath = path.relative(baseDir, file);
+        const htmlFile = await processMarkdownFile(file, relativePath, config, template);
+        result.htmlFiles.push(htmlFile);
+      }
+
+      // インデックスページを生成（ディレクトリ入力の場合のみ）
+      if (!inputIsFile && !useTempDir) {
+        await generateIndex(config, template);
+      }
+
+      console.log(`✅ HTML生成完了（${result.markdownCount}ファイル）`);
     }
 
-    // インデックスページを生成
-    await generateIndex(config, template);
+    // PDF生成
+    if (!skipPdf && config.pdf?.enabled) {
+      console.log('PDF生成を開始します...');
+      const pdfPath = await generatePdf(config, result.htmlFiles);
 
-    console.log(`✅ HTML生成完了（${result.markdownCount}ファイル）`);
+      // PDF単体出力の場合は、元の出力先にPDFをコピー
+      if (useTempDir && originalOutputDir) {
+        await fs.ensureDir(originalOutputDir);
+        const finalPdfPath = path.join(originalOutputDir, 'document.pdf');
+        await fs.copy(pdfPath, finalPdfPath);
+        result.pdfFile = finalPdfPath;
+        console.log(`✅ PDF生成完了: ${finalPdfPath}`);
+      } else {
+        result.pdfFile = pdfPath;
+        console.log(`✅ PDF生成完了: ${pdfPath}`);
+      }
+    }
+
+    // Puppeteerブラウザを終了（Mermaid変換で使用した場合）
+    await closeBrowser();
+
+    console.log('===== 生成完了 =====');
+
+    return result;
+  } finally {
+    // 一時ディレクトリをクリーンアップ
+    if (tempDir) {
+      console.log(`一時ディレクトリを削除しています: ${tempDir}`);
+      await removeTempDir(tempDir);
+    }
   }
-
-  // PDF生成
-  if (!skipPdf && config.pdf?.enabled) {
-    console.log('PDF生成を開始します...');
-    result.pdfFile = await generatePdf(config, result.htmlFiles);
-    console.log(`✅ PDF生成完了: ${result.pdfFile}`);
-  }
-
-  // Puppeteerブラウザを終了（Mermaid変換で使用した場合）
-  await closeBrowser();
-
-  console.log('===== 生成完了 =====');
-
-  return result;
 }
